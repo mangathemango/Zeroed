@@ -114,7 +114,7 @@ MonoBehaviour:
   adsTime: 0.3
   reloadTime: 1.2
   chargingTime: 0.5
-  defaultFireMode: semi
+  defaultFireMode: auto
   maxDamage: 10
   maxDamageRange: 2
   minDamage: 1

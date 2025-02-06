@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VectorGraphics;
 
 public class BaseGun : MonoBehaviour
 
@@ -71,7 +72,9 @@ public class BaseGun : MonoBehaviour
     private LookAtCursor lookAtCursor;
     private RotateAround rotateAround;
     private bool chamberEmpty = false;
+    private bool chargeEmpty = false;
     private GameObject chamberUI;
+    private GameObject chargeUI;
 
     public void SetupGun()
     {
@@ -118,7 +121,7 @@ public class BaseGun : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R)) {
             StartCoroutine(Reload());
         }
-        if (Input.GetKeyDown(KeyCode.F)) {
+        if (Input.GetMouseButtonDown(2)) {
             StartCoroutine(Charge());
         }
         if (Input.GetKeyDown(KeyCode.E)) {
@@ -145,10 +148,13 @@ public class BaseGun : MonoBehaviour
         if (currentAmmo <= 0) {
             yield break;
         }
+        Debug.Log("Charging");
         yield return new WaitForSeconds(chargingTime);
         chamberEmpty = false;
         chamberUI.SetActive(true);
         updateAmmoText();
+        Debug.Log("Charging Done");
+        updateChamberAndCharge();
     }
 
     IEnumerator resetMelee() {
@@ -191,9 +197,8 @@ public class BaseGun : MonoBehaviour
 
         if (currentAmmo <= 0) {
             chamberEmpty = true;
-            chamberUI.SetActive(false);
         }
-        
+        updateChamberAndCharge();
         updateAmmoText();
 
         float targetDistance = 0f;
@@ -243,6 +248,18 @@ public class BaseGun : MonoBehaviour
         ammoText.text = currentAmmo.ToString();
         while (ammoText.text.Length < 2) {
             ammoText.text = "0" + ammoText.text;
+        }
+    }
+
+    private void updateChamberAndCharge() {
+        if (chamberUI == null) {
+            return;
+        }
+        if (chamberEmpty) {
+            chamberUI.GetComponent<SVGImage>().color = new Color(1f, 1f, 1f, 0.5f);
+        }
+        else {
+            chamberUI.GetComponent<SVGImage>().color = new Color(1f, 1f, 1f, 1f);
         }
     }
 }
