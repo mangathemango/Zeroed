@@ -1,23 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SpitBall : BaseBullet
-{
+class CompressedMangifera: BaseBullet {
     public float despawnTime = 5;
     public float despawnOnCollisionTime = 0.1f;
+    public float explosionRadius = 5f;
+    public float explosionForce = 5f;
     public bool stopAfterCollision = true;
     private bool firstHit = true;
-    // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         SetupBullet();
         Invoke("Destroy", despawnTime);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (hit && firstHit) {
             if (stopAfterCollision) {
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -26,13 +21,18 @@ public class SpitBall : BaseBullet
                 GetComponent<SphereCollider>().enabled = false;
             }
 
-            if (hitObject.GetComponent<BaseEnemy>() != null) {
-                float damage = 10f;
-                hitObject.GetComponent<BaseEnemy>().TakeDamage(damage);
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
+            foreach (var hitCollider in hitColliders) {
+                if (hitCollider.GetComponent<BaseEnemy>() != null) {
+                    float damage = 10f;
+                    hitCollider.GetComponent<BaseEnemy>().TakeDamage(damage , -explosionForce * (transform.position - hitCollider.transform.position).normalized);
+                    hitCollider.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRadius);
+                }
             }
             Debug.Log("Hit object: " + hitObject.name);
             Invoke("Destroy", despawnOnCollisionTime);  
             firstHit = false;
         }
     }
+
 }

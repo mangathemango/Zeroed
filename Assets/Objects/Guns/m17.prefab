@@ -78,6 +78,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 304901731273121659}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2579787248506504169}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1478244880243114910}
   m_SourcePrefab: {fileID: 100100000, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
 --- !u!4 &239233234423673064 stripped
 Transform:
@@ -101,20 +107,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6099e78e199866244af4c808c9dce962, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gunName: M17
   ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
   fireSound: {fileID: 8300000, guid: e0b3e6e7b1232cd4590945bc9e4c9236, type: 3}
   ammoCapacity: 17
   mass: 0.1
   recoil: 1
-  requiresCharging: 0
+  requiresChargingBetweenShots: 1
+  verticalForce: 0
   muzzleVelocity: 365
   soundSignature: 75
-  triggerPullTime: 0.2
+  triggerPullTime: 0.03
+  fireDelay: 0
   switchTime: 1
   adsTime: 0.3
   reloadTime: 1.2
   chargingTime: 0.5
-  defaultFireMode: auto
+  defaultFireMode: semi
   maxDamage: 10
   maxDamageRange: 2
   minDamage: 1
@@ -122,7 +131,7 @@ MonoBehaviour:
   armorDamage: 0.5
   headshotMultiplier: 2
   hasSemiFire: 1
-  hasAutoFire: 0
+  hasAutoFire: 1
   rateOfFire: 600
   hasBurstFire: 0
   burstSize: 0
@@ -232,3 +241,52 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!54 &2579787248506504169
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071962651439539118}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!64 &-1478244880243114910
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071962651439539118}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
