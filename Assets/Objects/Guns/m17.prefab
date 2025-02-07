@@ -112,38 +112,36 @@ MonoBehaviour:
   ammoCapacity: 17
   mass: 0.1
   recoil: 1
-  verticalForce: 0
-  muzzleVelocity: 365
-  soundSignature: 75
-  triggerPullTime: 0.03
-  fireDelay: 0
-  switchTime: 0
-  adsTime: 0.3
-  reloadTime: 1.2
+  muzzleVelocity: 375
+  soundSignature: 10
+  triggerPullTimeSeconds: 0
+  switchTimeSeconds: 1
+  adsTimeSeconds: 0.3
+  reloadTimeSeconds: 1
   chargingTime: 0.5
-  defaultFireMode: semi
-  maxDamage: 10
-  maxDamageRange: 2
+  defaultFireMode: 0
+  maxDamage: 5
   minDamage: 1
+  maxDamageRange: 2
   minDamageRange: 100
-  armorDamage: 0.5
+  armorPenetrationPercent: 0
+  armorDamageMultiplier: 1
   headshotMultiplier: 2
   hasSemiFire: 1
   requiresChargingBetweenShots: 1
   hasAutoFire: 1
-  rateOfFire: 600
-  hasBurstFire: 0
-  burstSize: 0
+  shotsPerMinute: 600
+  hasBurstFire: 1
+  burstSize: 3
   burstRate: 600
-  pointFireSpread: 4
-  adsSpread: 0.1
-  pelletSpread: 2
+  pointFireSpreadMOA: 1
+  adsSpreadMOA: 0.1
+  pelletSpreadMOA: 2
   meleeDamage: 3
   meleeRange: 2
   meleeKnockback: 200
-  meleeStaggerTime: 0.5
+  meleeStaggerTimeSeconds: 0.5
   firePoint: {fileID: 239233234423673064}
-  Player: {fileID: 0}
   deadTriggerSFX: {fileID: 8300000, guid: a7fdda70882cdc5469d8c3b695d020d9, type: 3}
   disconnectorSFX: {fileID: 8300000, guid: 8a58ad3175a122347a48b14bb31401af, type: 3}
   fireSFX: {fileID: 8300000, guid: 20d76736fcfb59241a9313d7a26a30a3, type: 3}
