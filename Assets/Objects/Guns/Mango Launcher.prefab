@@ -131,14 +131,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: Mango Launcher
   ammoType: {fileID: 6661516185590720827, guid: c028ae1e7150b0f4d8e758263bd236e7, type: 3}
-  fireSound: {fileID: 8300000, guid: f7910e15066f09f4381e23dfc1d79cf4, type: 3}
   ammoCapacity: 10
   mass: 0.1
   recoil: 1
-  requiresCharging: 0
   verticalForce: 0
   muzzleVelocity: 300
-  soundSignature: 75
+  soundSignature: 1
   triggerPullTime: 0.2
   fireDelay: 0
   switchTime: 1
@@ -153,6 +151,7 @@ MonoBehaviour:
   armorDamage: 0.5
   headshotMultiplier: 2
   hasSemiFire: 1
+  requiresChargingBetweenShots: 0
   hasAutoFire: 0
   rateOfFire: 600
   hasBurstFire: 0
@@ -167,6 +166,13 @@ MonoBehaviour:
   meleeStaggerTime: 0.5
   firePoint: {fileID: 2669274604477488164}
   Player: {fileID: 0}
+  deadTriggerSFX: {fileID: 0}
+  disconnectorSFX: {fileID: 0}
+  fireSFX: {fileID: 8300000, guid: f7910e15066f09f4381e23dfc1d79cf4, type: 3}
+  reloadSFX: {fileID: 0}
+  chargeSFX: {fileID: 0}
+  meleeMissSFX: {fileID: 0}
+  meleeHitSFX: {fileID: 0}
 --- !u!136 &8012230581373431905
 CapsuleCollider:
   m_ObjectHideFlags: 0

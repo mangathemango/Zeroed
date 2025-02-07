@@ -42,6 +42,8 @@ public class Player : MonoBehaviour
         moveVertical = Input.GetAxisRaw("Vertical");
 
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        // rotate momement 45 degrees to the left
+        movement = Quaternion.Euler(0, 45, 0) * movement;
 
         if (movement.magnitude > 0)
         {
@@ -65,9 +67,6 @@ public class Player : MonoBehaviour
 
         DashCDBar.localScale = new Vector3(0.1f - (dashTime)/(dashCooldown) * 0.1f,DashCDBar.localScale.y,DashCDBar.localScale.z);
 
-        Vector3 movementX = new Vector3(moveHorizontal, 0.0f, 0.0f);
-        Vector3 movementY = new Vector3(0.0f, 0.0f, moveVertical);
-        rb.AddForce(movementX * currentSpeed, ForceMode.Force);
-        rb.AddForce(movementY * currentSpeed, ForceMode.Force);
+        rb.AddForce(movement * currentSpeed);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Unity.VectorGraphics;
 using UnityEngine.UI;
+using System.Runtime.CompilerServices;
 
 public class BaseGun : MonoBehaviour
 
@@ -79,6 +80,7 @@ public class BaseGun : MonoBehaviour
     private TextMeshProUGUI gunNameUI;
     private SVGImage chamberUI;
     private SVGImage chargeUI;
+    private RawImage ReloadingUI;
     private AudioSource audioSource;
     private LookAtCursor lookAtCursor;
     private RotateAround rotateAround;
@@ -153,6 +155,7 @@ public class BaseGun : MonoBehaviour
         if (reloading) {
             yield break;
         }
+        currentAmmoInMag = 0;
         audioSource.PlayOneShot(reloadSFX, soundSignature / 3);
         reloading = true;
         yield return new WaitForSeconds(reloadTime);
@@ -237,7 +240,7 @@ public class BaseGun : MonoBehaviour
         }
         Fire();
         currentAmmoInChamber -= 1;
-        if (currentAmmoInMag >= 1) {
+        if (currentAmmoInMag >= 1 && !reloading) {
             if (!(currentFireMode == "semi" && requiresChargingBetweenShots)) {
                 // Automatically put one bullet from mag into chamber
                 currentAmmoInMag -= 1;
@@ -321,10 +324,6 @@ public class BaseGun : MonoBehaviour
         updateFireMode();
     }
     private void updateAmmoText() {
-        if (reloading) {
-            ammoCountUI.text = "--";
-            return;
-        }
         int currentAmmo = currentAmmoInMag + currentAmmoInChamber;
         ammoCountUI.text = currentAmmo.ToString();
         while (ammoCountUI.text.Length < 2) {
@@ -332,6 +331,7 @@ public class BaseGun : MonoBehaviour
         }
     }
 
+    private float currentReloadRotation = 0;
     private void updateChamberUI() {
         if (currentAmmoInChamber <= 0) {
             chamberUI.color = new Color(1f, 1f, 1f, 0.5f);
@@ -340,6 +340,14 @@ public class BaseGun : MonoBehaviour
         else {
             chamberUI.color = new Color(1f, 1f, 1f, 1f);
             chargeUI.color = new Color(1f, 1f, 1f, 1f);
+        }
+        if (reloading) {
+            chargeUI.color = new Color(1f, 1f, 1f, 0f);
+            ReloadingUI.color = new Color(1f, 1f, 1f, 1f);
+            currentReloadRotation += 1; 
+            ReloadingUI.transform.rotation = Quaternion.Euler(0, 0, currentReloadRotation);
+        } else {
+            ReloadingUI.color = new Color(1f, 1f, 1f, 0f);
         }
     }
 
@@ -364,7 +372,7 @@ public class BaseGun : MonoBehaviour
         rotateAround.target = Player;
         rotateAround.offsetPosition = new Vector3(0, 0, -1);
 
-        string[] uiElementNames = { "Ammo Count UI", "Chamber UI", "Charge UI", "Fire Mode UI", "Gun Name UI" };
+        string[] uiElementNames = { "Ammo Count UI", "Chamber UI", "Charge UI", "Fire Mode UI", "Gun Name UI", "Reloading UI" };
         foreach (string uiElementName in uiElementNames) {
             GameObject uiObject = GameObject.Find(uiElementName);
             if (uiObject != null) {
@@ -388,6 +396,10 @@ public class BaseGun : MonoBehaviour
                     case "Gun Name UI":
                         gunNameUI = uiObject.GetComponent<TextMeshProUGUI>();
                         Debug.Log("Gun Name UI GameObject found!");
+                        break;
+                    case "Reloading UI":
+                        ReloadingUI = uiObject.GetComponent<RawImage>();
+                        Debug.Log("Reloading UI GameObject found!");
                         break;
                 }
             } else {
