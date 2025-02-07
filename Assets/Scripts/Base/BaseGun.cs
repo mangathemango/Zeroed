@@ -153,17 +153,13 @@ public abstract class BaseGun : MonoBehaviour
     // Update is called once per frame
     public void UpdateGun()
     {
-        if (Input.GetMouseButton(0)) {
-            StartCoroutine(PressTrigger());
-        } else {
-            triggerPressed = false;
-        }
-
         if (Input.GetMouseButtonDown(0)) {
             audioSource.PlayOneShot(disconnectorSFX, soundSignature);
             if (currentAmmoInChamber <= 0) {
                 audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
             }
+            StartCoroutine(PressTrigger());
+
         }
 
         if (triggerPressed) {
@@ -251,10 +247,8 @@ public abstract class BaseGun : MonoBehaviour
     private IEnumerator PressTrigger() {
         yield return new WaitForSeconds(triggerPullTimeSeconds);
         triggerPressed = true;
-        if (Input.GetMouseButtonUp(0)) {
-            triggerPressed = false;
-            yield break;
-        }
+        yield return new WaitUntil(() => !Input.GetMouseButton(0));
+        triggerPressed = false;
     }
 
     IEnumerator ResetAutoFireReady() {
