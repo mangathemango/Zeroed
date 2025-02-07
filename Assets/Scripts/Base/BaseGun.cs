@@ -11,11 +11,9 @@ public class BaseGun : MonoBehaviour
     [Header("General")]
     public string gunName;
     public GameObject ammoType;
-    public AudioClip fireSound;
     public int ammoCapacity = 10;
     public float mass = 0.1f;
     public float recoil = 1.0f;
-    public bool requiresChargingBetweenShots = false;
     public float verticalForce = 0.0f;
     public float muzzleVelocity = 300.0f;
     public float soundSignature = 75.0f;
@@ -40,6 +38,7 @@ public class BaseGun : MonoBehaviour
 
     [Header("Semi")]
     public bool hasSemiFire = false;
+    public bool requiresChargingBetweenShots = false;
     
 
     [Header("Auto")]
@@ -66,6 +65,15 @@ public class BaseGun : MonoBehaviour
     [Header("References")]
     public Transform firePoint;
     public Transform Player;
+    public AudioClip deadTriggerSFX;
+    public AudioClip disconnectorSFX;
+    public AudioClip fireSFX;
+    public AudioClip reloadSFX;
+    public AudioClip chargeSFX;
+    public AudioClip meleeMissSFX;
+    public AudioClip meleeHitSFX;
+
+
     private TextMeshProUGUI ammoCountUI;
     private TextMeshProUGUI fireModeUI;
     private TextMeshProUGUI gunNameUI;
@@ -86,6 +94,7 @@ public class BaseGun : MonoBehaviour
     private bool reloading = false;
     private bool triggerPressed = false;
 
+
     public void SetupGun()
     {
         currentFireMode = defaultFireMode;
@@ -103,6 +112,13 @@ public class BaseGun : MonoBehaviour
             StartCoroutine(PressTrigger());
         } else {
             triggerPressed = false;
+        }
+
+        if (Input.GetMouseButtonDown(0)) {
+            audioSource.PlayOneShot(disconnectorSFX, soundSignature);
+            if (currentAmmoInChamber <= 0) {
+                audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
+            }
         }
 
         if (triggerPressed) {
@@ -137,6 +153,7 @@ public class BaseGun : MonoBehaviour
         if (reloading) {
             yield break;
         }
+        audioSource.PlayOneShot(reloadSFX, soundSignature / 3);
         reloading = true;
         yield return new WaitForSeconds(reloadTime);
         currentAmmoInMag = ammoCapacity;
@@ -144,9 +161,10 @@ public class BaseGun : MonoBehaviour
     }
 
     IEnumerator Charge() {
-        if (currentAmmoInMag < 1 || charging) {
+        if (currentAmmoInMag < 1 || charging || currentAmmoInChamber >= 1) {
             yield break;
         }
+        audioSource.PlayOneShot(chargeSFX, soundSignature / 2);
         charging = true;
         Debug.Log("Charging");
         yield return new WaitForSeconds(chargingTime);
@@ -157,7 +175,7 @@ public class BaseGun : MonoBehaviour
     }
 
     IEnumerator resetMelee() {
-        yield return new WaitForSeconds(chargingTime);
+        yield return new WaitForSeconds(switchTime);
         meleeReady = true;
     }
 
@@ -179,9 +197,11 @@ public class BaseGun : MonoBehaviour
             }
             meleeReady = false;
             StartCoroutine(resetMelee());
+            audioSource.PlayOneShot(meleeHitSFX, soundSignature / 2);  
             Debug.Log("Melee hit: " + hit.collider.gameObject.name);
         } else {
             Debug.Log("Melee Attack thrown, missed");
+            audioSource.PlayOneShot(meleeMissSFX, soundSignature / 2);  
         }
 
     }
@@ -196,7 +216,10 @@ public class BaseGun : MonoBehaviour
     }
 
     private void Shoot() {
-        if (currentAmmoInChamber <= 0 || reloading || charging) {
+        if (charging) {
+            return;
+        }
+        if (currentAmmoInChamber <= 0) {
             return;
         }
         if (currentFireMode == "semi") {
@@ -212,16 +235,19 @@ public class BaseGun : MonoBehaviour
             autoFireReady = false;
             Invoke("ResetAutoFireReady", 60 / rateOfFire);
         }
-
-        if (fireDelay > 0) {
-            
-        }
+        Fire();
         currentAmmoInChamber -= 1;
-        if (currentAmmoInMag >= 1 && !requiresChargingBetweenShots) {
-            currentAmmoInMag -= 1;
-            currentAmmoInChamber += 1;
+        if (currentAmmoInMag >= 1) {
+            if (!(currentFireMode == "semi" && requiresChargingBetweenShots)) {
+                // Automatically put one bullet from mag into chamber
+                currentAmmoInMag -= 1;
+                currentAmmoInChamber += 1;
+            }
         }
+    }
 
+    private void Fire() {
+        
         float targetDistance = 0f;
 
         Vector3 expectedHitPoint;
@@ -261,7 +287,9 @@ public class BaseGun : MonoBehaviour
         bullet.GetComponent<Rigidbody>().velocity = shootingDirection * muzzleVelocity;
         bullet.GetComponent<BaseBullet>().source = gameObject;
 
-        audioSource.PlayOneShot(fireSound);
+        if (fireSFX != null) {
+            audioSource.PlayOneShot(fireSFX, soundSignature);
+        }
     }
 
     private void switchFireMode() {

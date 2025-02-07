@@ -109,17 +109,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: M17
   ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
-  fireSound: {fileID: 8300000, guid: e0b3e6e7b1232cd4590945bc9e4c9236, type: 3}
   ammoCapacity: 17
   mass: 0.1
   recoil: 1
-  requiresChargingBetweenShots: 1
   verticalForce: 0
   muzzleVelocity: 365
   soundSignature: 75
   triggerPullTime: 0.03
   fireDelay: 0
-  switchTime: 1
+  switchTime: 0
   adsTime: 0.3
   reloadTime: 1.2
   chargingTime: 0.5
@@ -131,6 +129,7 @@ MonoBehaviour:
   armorDamage: 0.5
   headshotMultiplier: 2
   hasSemiFire: 1
+  requiresChargingBetweenShots: 1
   hasAutoFire: 1
   rateOfFire: 600
   hasBurstFire: 0
@@ -145,6 +144,13 @@ MonoBehaviour:
   meleeStaggerTime: 0.5
   firePoint: {fileID: 239233234423673064}
   Player: {fileID: 0}
+  deadTriggerSFX: {fileID: 8300000, guid: a7fdda70882cdc5469d8c3b695d020d9, type: 3}
+  disconnectorSFX: {fileID: 8300000, guid: 8a58ad3175a122347a48b14bb31401af, type: 3}
+  fireSFX: {fileID: 8300000, guid: 20d76736fcfb59241a9313d7a26a30a3, type: 3}
+  reloadSFX: {fileID: 8300000, guid: 32aa3b65e1934f448bdc2a4005e76252, type: 3}
+  chargeSFX: {fileID: 8300000, guid: dea3910796337fb43af038b79056450f, type: 3}
+  meleeMissSFX: {fileID: 8300000, guid: 30e47c7ac2501e24fa62adb27e95f093, type: 3}
+  meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
 --- !u!82 &304901731273121659
 AudioSource:
   m_ObjectHideFlags: 0
