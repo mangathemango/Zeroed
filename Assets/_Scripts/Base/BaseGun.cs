@@ -140,7 +140,7 @@ public abstract class BaseGun : MonoBehaviour
     private bool reloading = false;
     private bool triggerPressed = false;
 
-    public void SetupGun()
+    protected virtual void Start()
     {
         currentFireMode = defaultFireMode;
         currentAmmoInMag = ammoCapacity - 1;
@@ -151,7 +151,7 @@ public abstract class BaseGun : MonoBehaviour
 
 
     // Update is called once per frame
-    public void UpdateGun()
+    protected virtual void Update()
     {
         if (Input.GetMouseButtonDown(0)) {
             audioSource.PlayOneShot(disconnectorSFX, soundSignature);
