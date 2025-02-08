@@ -102,7 +102,7 @@ MonoBehaviour:
   hitObject: {fileID: 0}
   source: {fileID: 0}
   despawnTime: 5
-  despawnOnCollisionTime: 0
+  despawnOnCollisionTime: 0.1
   stopAfterCollision: 1
 --- !u!135 &4441117753262351371
 SphereCollider:

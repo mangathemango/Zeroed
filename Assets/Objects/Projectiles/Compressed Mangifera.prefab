@@ -125,7 +125,7 @@ MonoBehaviour:
   despawnTime: 5
   despawnOnCollisionTime: 0.1
   explosionRadius: 5
-  explosionForce: 200
+  explosionForce: 50
   stopAfterCollision: 1
 --- !u!54 &-964030716718256041
 Rigidbody:
