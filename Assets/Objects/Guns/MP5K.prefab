@@ -66,15 +66,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
       propertyPath: m_Name
-      value: M17
+      value: MP5K
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3246689871912147845}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 304901731273121659}
@@ -84,72 +81,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: -1478244880243114910}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4798405821913372664}
   m_SourcePrefab: {fileID: 100100000, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
---- !u!4 &239233234423673064 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1392055971398381079, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
-  m_PrefabInstance: {fileID: 1153060988617170687}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2071962651439539118 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
   m_PrefabInstance: {fileID: 1153060988617170687}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3246689871912147845
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2071962651439539118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6099e78e199866244af4c808c9dce962, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gunName: M17
-  ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
-  ammoCapacity: 17
-  mass: 0.1
-  muzzleVelocity: 375
-  soundSignature: 1
-  triggerPullTimeSeconds: 0
-  switchTimeSeconds: 1
-  adsTimeSeconds: 0.3
-  reloadTimeSeconds: 1
-  chargingTime: 0.5
-  defaultFireMode: 1
-  maxDamage: 5
-  minDamage: 1
-  maxDamageRange: 2
-  minDamageRange: 100
-  armorPenetrationPercent: 0
-  armorDamageMultiplier: 1
-  headshotMultiplier: 2
-  hasSemiFire: 1
-  requiresChargingBetweenShots: 1
-  hasAutoFire: 1
-  shotsPerMinute: 600
-  hasBurstFire: 1
-  burstSize: 3
-  burstRate: 600
-  pointFireSpreadMOA: 1
-  adsSpreadMOA: 0.1
-  pelletSpreadMOA: 2
-  recoilY: 1
-  recoilX: 0
-  meleeDamage: 3
-  meleeRange: 2
-  meleeKnockback: 200
-  meleeStaggerTimeSeconds: 0.5
-  firePoint: {fileID: 239233234423673064}
-  deadTriggerSFX: {fileID: 8300000, guid: a7fdda70882cdc5469d8c3b695d020d9, type: 3}
-  disconnectorSFX: {fileID: 8300000, guid: 8a58ad3175a122347a48b14bb31401af, type: 3}
-  fireSFX: {fileID: 8300000, guid: 20d76736fcfb59241a9313d7a26a30a3, type: 3}
-  reloadSFX: {fileID: 8300000, guid: 32aa3b65e1934f448bdc2a4005e76252, type: 3}
-  chargeSFX: {fileID: 8300000, guid: dea3910796337fb43af038b79056450f, type: 3}
-  meleeMissSFX: {fileID: 8300000, guid: 30e47c7ac2501e24fa62adb27e95f093, type: 3}
-  meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
 --- !u!82 &304901731273121659
 AudioSource:
   m_ObjectHideFlags: 0
@@ -295,3 +235,57 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &-4798405821913372664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071962651439539118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c85e4201bfab357438feeb9a2bf7601e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunName: MP5K
+  ammoType: {fileID: 0}
+  ammoCapacity: 10
+  mass: 0.1
+  recoil: 1
+  muzzleVelocity: 300
+  soundSignature: 1
+  triggerPullTimeSeconds: 0.2
+  switchTimeSeconds: 1
+  adsTimeSeconds: 0.3
+  reloadTimeSeconds: 1
+  chargingTime: 0.5
+  defaultFireMode: 0
+  maxDamage: 10
+  minDamage: 1
+  maxDamageRange: 10
+  minDamageRange: 100
+  armorPenetrationPercent: 0
+  armorDamageMultiplier: 1
+  headshotMultiplier: 2
+  hasSemiFire: 0
+  requiresChargingBetweenShots: 0
+  hasAutoFire: 0
+  shotsPerMinute: 600
+  hasBurstFire: 0
+  burstSize: 0
+  burstRate: 600
+  pointFireSpreadMOA: 1
+  adsSpreadMOA: 0.1
+  pelletSpreadMOA: 2
+  meleeDamage: 10
+  meleeRange: 2
+  meleeKnockback: 1
+  meleeStaggerTimeSeconds: 0.5
+  firePoint: {fileID: 0}
+  deadTriggerSFX: {fileID: 0}
+  disconnectorSFX: {fileID: 0}
+  fireSFX: {fileID: 0}
+  reloadSFX: {fileID: 0}
+  chargeSFX: {fileID: 0}
+  meleeMissSFX: {fileID: 0}
+  meleeHitSFX: {fileID: 0}

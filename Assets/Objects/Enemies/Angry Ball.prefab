@@ -98,9 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbdc1a44841fd6d4ba613407c8fb302e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
-  player: {fileID: 0}
+  health: 10
+  deathTime: 1
   speed: 30
+  player: {fileID: 0}
 --- !u!135 &111949785114736257
 SphereCollider:
   m_ObjectHideFlags: 0

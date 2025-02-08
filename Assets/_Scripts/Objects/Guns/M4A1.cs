@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class M17 : BaseGun
+public class M4A1 : BaseGun
 {
     // Start is called before the first frame update
 }

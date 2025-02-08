@@ -7,17 +7,19 @@ public class LookAtCursor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
         // Get mouse position in 3d as Ray
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit raycastHit))
-        {
-            transform.LookAt(raycastHit.point);
+        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {   
+            Vector3 targetPosition = hit.point;
+            targetPosition.y = transform.position.y;
+            transform.LookAt(targetPosition);
         }
 
     }

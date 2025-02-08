@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2669274604477488164}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Fire Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 867880110407108443}
   - component: {fileID: 8977170373385532306}
   - component: {fileID: 8012230581373431905}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Mango Launcher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,49 +130,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunName: Mango Launcher
-  ammoType: {fileID: 6661516185590720827, guid: c028ae1e7150b0f4d8e758263bd236e7, type: 3}
-  ammoCapacity: 10
+  ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
+  ammoCapacity: 20
   mass: 0.1
-  recoil: 1
-  verticalForce: 0
   muzzleVelocity: 300
   soundSignature: 1
-  triggerPullTime: 0.2
-  fireDelay: 0
-  switchTime: 1
-  adsTime: 0.3
-  reloadTime: 1
+  triggerPullTimeSeconds: 0
+  switchTimeSeconds: 1
+  adsTimeSeconds: 0
+  reloadTimeSeconds: 1
   chargingTime: 0.5
-  defaultFireMode: semi
+  defaultFireMode: 1
   maxDamage: 10
-  maxDamageRange: 10
   minDamage: 1
+  maxDamageRange: 10
   minDamageRange: 100
-  armorDamage: 0.5
+  armorPenetrationPercent: 0
+  armorDamageMultiplier: 1
   headshotMultiplier: 2
   hasSemiFire: 1
   requiresChargingBetweenShots: 0
-  hasAutoFire: 0
-  rateOfFire: 600
-  hasBurstFire: 0
-  burstSize: 0
+  hasAutoFire: 1
+  shotsPerMinute: 600
+  hasBurstFire: 1
+  burstSize: 3
   burstRate: 600
-  pointFireSpread: 1
-  adsSpread: 0.1
-  pelletSpread: 2
+  pointFireSpreadMOA: 1
+  adsSpreadMOA: 0.1
+  pelletSpreadMOA: 2
+  recoilY: 0.35
+  recoilX: 0.35
   meleeDamage: 10
   meleeRange: 2
   meleeKnockback: 1
-  meleeStaggerTime: 0.5
+  meleeStaggerTimeSeconds: 0.5
   firePoint: {fileID: 2669274604477488164}
-  Player: {fileID: 0}
-  deadTriggerSFX: {fileID: 0}
-  disconnectorSFX: {fileID: 0}
-  fireSFX: {fileID: 8300000, guid: f7910e15066f09f4381e23dfc1d79cf4, type: 3}
-  reloadSFX: {fileID: 0}
-  chargeSFX: {fileID: 0}
-  meleeMissSFX: {fileID: 0}
-  meleeHitSFX: {fileID: 0}
+  deadTriggerSFX: {fileID: 8300000, guid: a7fdda70882cdc5469d8c3b695d020d9, type: 3}
+  disconnectorSFX: {fileID: 8300000, guid: 8a58ad3175a122347a48b14bb31401af, type: 3}
+  fireSFX: {fileID: 8300000, guid: 296224b51c9b9524cbc2a513f733d000, type: 3}
+  reloadSFX: {fileID: 8300000, guid: 32aa3b65e1934f448bdc2a4005e76252, type: 3}
+  chargeSFX: {fileID: 8300000, guid: dea3910796337fb43af038b79056450f, type: 3}
+  meleeMissSFX: {fileID: 8300000, guid: f7910e15066f09f4381e23dfc1d79cf4, type: 3}
+  meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
 --- !u!136 &8012230581373431905
 CapsuleCollider:
   m_ObjectHideFlags: 0

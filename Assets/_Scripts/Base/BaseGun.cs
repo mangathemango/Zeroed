@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Runtime.CompilerServices;
 using UnityEditor.Callbacks;
 using GunStuff;
+using UnityEditor.SceneManagement;
 
 namespace GunStuff {
     public enum FireMode {
@@ -43,8 +44,6 @@ public abstract class BaseGun : MonoBehaviour
     public int ammoCapacity = 10;
     [Range (0.0f, 10.0f)]
     public float mass = 0.1f;
-    [Range (0.0f, 10.0f)]
-    public float recoil = 1.0f;
     [Range (10.0f, 1000.0f)]
     public float muzzleVelocity = 300.0f;
     [Range (1.0f, 10.0f)]
@@ -100,6 +99,12 @@ public abstract class BaseGun : MonoBehaviour
     public float adsSpreadMOA = 0.1f;
     public float pelletSpreadMOA = 2.0f;
 
+    [Header("Recoil")]
+    [Range (0.0f, 10.0f)]
+    public float recoilY = 1.0f;
+    [Range (0.0f, 10.0f)]
+    public float recoilX = 1.0f;
+
     [Header("Melee")]
     public float meleeDamage = 10.0f;
     public float meleeRange = 2f;
@@ -138,6 +143,9 @@ public abstract class BaseGun : MonoBehaviour
     private int currentAmmoInChamber;
     private bool charging = false;
     private bool reloading = false;
+    private bool aiming = false;
+    private bool aimCoroutineRunning = false;
+    private bool cameraZoomedIn = false;
     private bool triggerPressed = false;
 
     protected virtual void Start()
@@ -152,7 +160,8 @@ public abstract class BaseGun : MonoBehaviour
 
     // Update is called once per frame
     protected virtual void Update()
-    {
+    {   
+        transform.rotation = Player.rotation;
         if (Input.GetMouseButtonDown(0)) {
             audioSource.PlayOneShot(disconnectorSFX, soundSignature);
             if (currentAmmoInChamber <= 0) {
@@ -161,9 +170,14 @@ public abstract class BaseGun : MonoBehaviour
             StartCoroutine(PressTrigger());
 
         }
-
+        if (Input.GetMouseButton(1)) {
+            StartCoroutine(AimDownSight());
+        }
         if (triggerPressed) {
-            Shoot();
+            HandleTriggerPressed();
+        }
+        if (aiming && !cameraZoomedIn && !aimCoroutineRunning) {
+            StartCoroutine(Aim());
         }
         if (Input.GetKeyDown(KeyCode.R)) {
             StartCoroutine(Reload());
@@ -194,7 +208,43 @@ public abstract class BaseGun : MonoBehaviour
     }
 
 
-
+    IEnumerator Aim() {
+        aimCoroutineRunning = true;
+        if (cameraZoomedIn) {
+            yield break;
+        }
+        Debug.Log("Aiming");
+        cameraZoomedIn = true;
+        
+        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit)) {
+            Camera.main.GetComponent<Follow>().target = null;
+            Camera.main.GetComponent<LookAt>().target = null;
+            Camera.main.GetComponent<Follow>().targetPosition = hit.point + Camera.main.GetComponent<Follow>().offset;
+            Camera.main.GetComponent<LookAt>().targetPosition = hit.point;
+            Crosshair.Instance.targetPosition = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+            float targetOrthographicSize = 5; // Set your desired zoom level here
+            float zoomSpeed = -4; // Set your desired zoom speed here
+            while (Camera.main.orthographicSize > targetOrthographicSize) {
+                Camera.main.orthographicSize += zoomSpeed * Time.deltaTime;
+                zoomSpeed += 4 * Time.deltaTime;
+                if (!aiming || !Input.GetMouseButton(1)) {
+                    break;
+                }
+                yield return null;
+            }
+            Camera.main.orthographicSize = targetOrthographicSize;
+        }
+        yield return new WaitUntil(() => !aiming || !Input.GetMouseButton(1));
+        cameraZoomedIn = false;
+        Camera.main.GetComponent<LookAt>().target = Player;
+        Camera.main.GetComponent<Follow>().target = Player;
+        Crosshair.Instance.transform.position = hit.point;
+        aimCoroutineRunning = false;
+        Camera.main.orthographicSize = 7;
+        
+    }
 
     /// <summary>
     /// Put one bullet from mag into chamber
@@ -245,11 +295,25 @@ public abstract class BaseGun : MonoBehaviour
     }
 
     private IEnumerator PressTrigger() {
-        yield return new WaitForSeconds(triggerPullTimeSeconds);
+        if (triggerPullTimeSeconds > 0) {
+            yield return new WaitForSeconds(triggerPullTimeSeconds);
+        }
         triggerPressed = true;
         yield return new WaitUntil(() => !Input.GetMouseButton(0));
         triggerPressed = false;
     }
+
+    private IEnumerator AimDownSight() {
+        if (adsTimeSeconds > 0) {
+            yield return new WaitForSeconds(adsTimeSeconds);
+        }
+        if (Input.GetMouseButton(1)) {
+            aiming = true;
+        }
+        yield return new WaitUntil(() => !Input.GetMouseButton(1));
+        aiming = false;
+    }
+
 
     IEnumerator ResetAutoFireReady() {
         yield return new WaitForSeconds(60 / shotsPerMinute);
@@ -266,27 +330,28 @@ public abstract class BaseGun : MonoBehaviour
         }
         yield return new WaitForSeconds(60 / burstRate);
         burstFireReady = true;
-        yield return new WaitUntil(() => !triggerPressed);
+        HandleTriggerPressed();
+        yield return new WaitUntil(() => (!triggerPressed && burstShotsFired >= burstSize) || reloading);
+        yield return new WaitForSeconds(60 / burstRate);
         burstShotsFired = 0;
         burstFireReady = true;
     }
-    public void Shoot() {
-        if (currentAmmoInChamber <= 0 ||
-            (currentFireMode == FireMode.Semi && !semiFireReady) ||
-            (currentFireMode == FireMode.Auto && !autoFireReady) ||
-            (currentFireMode == FireMode.Burst && !burstFireReady)) {
+    public void HandleTriggerPressed() {
+        if (currentAmmoInChamber <= 0) {
             return;
         }
-        Fire();
-        if (currentFireMode == FireMode.Semi) {
+        if (currentFireMode == FireMode.Semi && semiFireReady) {
+            Fire();
             semiFireReady = false;
             StartCoroutine(ResetSemiFireReady());
         }
-        if (currentFireMode == FireMode.Auto) {
+        if (currentFireMode == FireMode.Auto && autoFireReady) {
+            Fire();
             autoFireReady = false;
             StartCoroutine(ResetAutoFireReady());
         }
-        if (currentFireMode == FireMode.Burst) {
+        if (currentFireMode == FireMode.Burst && burstFireReady) {
+            Fire();
             burstFireReady = false;
             StartCoroutine(ResetBurstFireReady());
         }
@@ -304,9 +369,9 @@ public abstract class BaseGun : MonoBehaviour
         Vector3 expectedHitPoint = new Vector3();
         Vector3 targetPoint = new Vector3();
         float targetDistance = 1f;
-
+        Vector3 crosshairPosition = Crosshair.Instance.transform.position;
         // Cast the first ray from the camera to the mouse position to get target point
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(crosshairPosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit)) {
             targetPoint = hit.point;
@@ -319,11 +384,13 @@ public abstract class BaseGun : MonoBehaviour
             expectedHitPoint = hit.point;
         }
         
-        
         Vector3 shootingDirection = (expectedHitPoint - firePoint.position).normalized;
 
         // Convert MOA to radians
         float spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
+        if (aiming) {
+            spreadRadians = adsSpreadMOA * Mathf.Deg2Rad / 60f;
+        }
         // Calculate the spread based on the distance to the target
         float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
         // Apply random spread
@@ -335,9 +402,18 @@ public abstract class BaseGun : MonoBehaviour
         bullet.GetComponent<Rigidbody>().velocity = shootingDirection * muzzleVelocity;
         bullet.GetComponent<BaseBullet>().source = gameObject;
 
+                // Play the fire sound
+
         if (fireSFX != null) {
             audioSource.PlayOneShot(fireSFX, soundSignature);
         }
+
+        // Move the crosshair to random direction
+        Crosshair.Instance.recoil = new Vector3(
+            Random.Range(-recoilX, recoilX) * 10,
+            Random.Range(-recoilY, recoilY) * 10,
+            0
+        );
     }
     
     private FireMode[] fireModeList;
@@ -412,7 +488,6 @@ public abstract class BaseGun : MonoBehaviour
             Debug.LogError("Player not found!");
         }
 
-        lookAtCursor = gameObject.AddComponent<LookAtCursor>();
         rotateAround = gameObject.AddComponent<RotateAround>();
         rotateAround.target = Player;
         rotateAround.offsetPosition = new Vector3(0, 0, -1);
