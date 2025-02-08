@@ -120,81 +120,73 @@ public abstract class BaseGun : MonoBehaviour
     public AudioClip chargeSFX;
     public AudioClip meleeMissSFX;
     public AudioClip meleeHitSFX;
-    
-    [System.NonSerialized] public Transform Player;
-    private TextMeshProUGUI ammoCountUI;
-    private TextMeshProUGUI fireModeUI;
-    private TextMeshProUGUI gunNameUI;
-    private SVGImage chamberUI;
-    private SVGImage chargeUI;
-    private RawImage ReloadingUI;
-    private AudioSource audioSource;
-    private LookAtCursor lookAtCursor;
-    private RotateAround rotateAround;
+#if DEBUG
+    public Transform player;
+    public AudioSource audioSource;
+    public RotateAround rotateAround;
+    public FireMode currentFireMode;
+    public bool meleeReady = true;
+    public bool autoFireReady = true;
+    public bool semiFireReady = true;
+    public bool burstFireReady = true;
+    public int currentAmmoInMag;
+    public int currentAmmoInChamber;
+    public bool triggerPressed = false;
+    public bool charging = false;
+    public bool reloading = false;
+    public bool aiming = false;
+#else
+    [System.NonSerialized] public Transform player;
+    [System.NonSerialized] public AudioSource audioSource;
+    [System.NonSerialized] public RotateAround rotateAround;
+    [System.NonSerialized] public FireMode currentFireMode;
+    [System.NonSerialized] public bool meleeReady = true;
+    [System.NonSerialized] public bool autoFireReady = true;
+    [System.NonSerialized] public bool semiFireReady = true;
+    [System.NonSerialized] public bool burstFireReady = true;
+    [System.NonSerialized] public int currentAmmoInMag;
+    [System.NonSerialized] public int currentAmmoInChamber;
+    [System.NonSerialized] public bool triggerPressed = false;
+    [System.NonSerialized] public bool charging = false;
+    [System.NonSerialized] public bool reloading = false;
+    [System.NonSerialized] public bool aiming = false;
+#endif
 
     [Header("Internal")]
-    private bool meleeReady = true;
-    private FireMode currentFireMode;
-    private bool autoFireReady = true;
-    private bool semiFireReady = true;
-    private bool burstFireReady = true;
-    private int burstShotsFired = 0;
-    private int currentAmmoInMag;
-    private int currentAmmoInChamber;
-    private bool charging = false;
-    private bool reloading = false;
-    private bool aiming = false;
     private bool aimCoroutineRunning = false;
-    private bool cameraZoomedIn = false;
-    private bool triggerPressed = false;
+    private bool pressTriggerCoroutineRunning = false;
+    private int burstShotsFired = 0;
 
     protected virtual void Start()
     {
+        player = GameObject.Find("Player").transform;
         currentFireMode = defaultFireMode;
         currentAmmoInMag = ammoCapacity - 1;
         currentAmmoInChamber = 1;
-        getReferences();
         setupFireModes();
+        rotateAround = gameObject.AddComponent<RotateAround>();
+        rotateAround.target = player;
+        rotateAround.offsetPosition = new Vector3(0, 0, -1);
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
 
     // Update is called once per frame
     protected virtual void Update()
     {   
-        transform.rotation = Player.rotation;
-        if (Input.GetMouseButtonDown(0)) {
-            audioSource.PlayOneShot(disconnectorSFX, soundSignature);
-            if (currentAmmoInChamber <= 0) {
-                audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
-            }
-            StartCoroutine(PressTrigger());
-
-        }
-        if (Input.GetMouseButton(1)) {
-            StartCoroutine(AimDownSight());
-        }
+        transform.rotation = player.rotation;
         if (triggerPressed) {
             HandleTriggerPressed();
         }
-        if (aiming && !cameraZoomedIn && !aimCoroutineRunning) {
+        if (aiming && !aimCoroutineRunning) {
             StartCoroutine(Aim());
         }
-        if (Input.GetKeyDown(KeyCode.R)) {
-            StartCoroutine(Reload());
-        }
-        if (Input.GetMouseButtonDown(2)) {
-            StartCoroutine(Charge());
-        }
-        if (Input.GetKeyDown(KeyCode.E)) {
-            Melee();
-        }
-        if (Input.GetKeyDown(KeyCode.V)) {
-            switchFireMode();
-        }
-        updateUI();
     }
 
-    IEnumerator Reload() {
+    public IEnumerator Reload() {
         if (reloading) {
             yield break;
         }
@@ -235,10 +227,9 @@ public abstract class BaseGun : MonoBehaviour
             Camera.main.orthographicSize = targetOrthographicSize;
         }
         yield return new WaitUntil(() => !aiming);
-        cameraZoomedIn = false;
 
-        Camera.main.GetComponent<LookAt>().target = Player;
-        Camera.main.GetComponent<Follow>().target = Player;
+        Camera.main.GetComponent<LookAt>().target = player;
+        Camera.main.GetComponent<Follow>().target = player;
 
         Camera.main.orthographicSize = originalOthrographicSize;
         
@@ -248,7 +239,7 @@ public abstract class BaseGun : MonoBehaviour
     /// <summary>
     /// Put one bullet from mag into chamber
     /// </summary>
-    IEnumerator Charge() {
+    public IEnumerator Charge() {
         if (currentAmmoInMag < 1 || charging || currentAmmoInChamber >= 1) {
             yield break;
         }
@@ -266,19 +257,19 @@ public abstract class BaseGun : MonoBehaviour
         meleeReady = true;
     }
 
-    private void Melee() {
+    public void Melee() {
         if (!meleeReady) {
             Debug.Log("Melee not ready");
             return;
         }
+        Vector3 targetDirection = player.GetComponent<Player>().GetPlayerDirection().point - player.transform.position;
+        bool meleeHit = false;
         RaycastHit hit;
-        Ray screenRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Vector3 targetDirection = new Vector3();
-        if (Physics.Raycast(screenRay, out hit)) {
-            targetDirection = hit.point - Player.transform.position;
+        if (Physics.Raycast(player.transform.position, targetDirection, out hit, meleeRange)) {
+            meleeHit = true;
         }
 
-        if (Physics.Raycast(Player.transform.position, targetDirection, out hit, meleeRange)) {
+        if (meleeHit) {
             GameObject hitObject = hit.collider.gameObject;
             if (hitObject.GetComponent<BaseEnemy>() != null) {
                 hit.collider.gameObject.GetComponent<BaseEnemy>().TakeDamage(meleeDamage, firePoint.forward * meleeKnockback, meleeStaggerTimeSeconds);
@@ -292,16 +283,26 @@ public abstract class BaseGun : MonoBehaviour
 
     }
 
-    private IEnumerator PressTrigger() {
+    public IEnumerator PressTrigger() {
+        if (pressTriggerCoroutineRunning) {
+            yield break;
+        }
+        pressTriggerCoroutineRunning = true;
+        audioSource.PlayOneShot(disconnectorSFX, soundSignature);
+        if (currentAmmoInChamber <= 0) {
+            audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
+        }
+
         if (triggerPullTimeSeconds > 0) {
             yield return new WaitForSeconds(triggerPullTimeSeconds);
         }
         triggerPressed = true;
         yield return new WaitUntil(() => !Input.GetMouseButton(0));
         triggerPressed = false;
+        pressTriggerCoroutineRunning = false;
     }
 
-    private IEnumerator AimDownSight() {
+    public IEnumerator AimDownSight() {
         if (adsTimeSeconds > 0) {
             yield return new WaitForSeconds(adsTimeSeconds);
         }
@@ -311,15 +312,15 @@ public abstract class BaseGun : MonoBehaviour
         yield return new WaitUntil(() => !Input.GetMouseButton(1));
         aiming = false;
     }
-    IEnumerator ResetAutoFireReady() {
+    private IEnumerator ResetAutoFireReady() {
         yield return new WaitForSeconds(60 / shotsPerMinute);
         autoFireReady = true;
     }
-    IEnumerator ResetSemiFireReady() {
+    private IEnumerator ResetSemiFireReady() {
         yield return new WaitUntil(() => !triggerPressed);
         semiFireReady = true;
     }
-    IEnumerator ResetBurstFireReady() {
+    private IEnumerator ResetBurstFireReady() {
         burstShotsFired += 1;
         if (burstShotsFired >= burstSize) {
             yield break;
@@ -353,7 +354,7 @@ public abstract class BaseGun : MonoBehaviour
         }
     }
 
-    public void Fire() {
+    protected virtual void Fire() {
         currentAmmoInChamber -= 1;
         if (currentAmmoInMag >= 1 && !reloading) {
             if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
@@ -362,10 +363,11 @@ public abstract class BaseGun : MonoBehaviour
             }
         }
 
-        Vector3 expectedHitPoint = new Vector3();
-        Vector3 targetPoint = new Vector3();
-        float targetDistance = 1f;
-        RaycastHit PlayerDirection = Player.GetComponent<Player>().GetPlayerDirection();
+        Vector3 expectedHitPoint = new Vector3();;
+        RaycastHit PlayerDirection = player.GetComponent<Player>().GetPlayerDirection();
+        Vector3 targetPoint = PlayerDirection.point;
+        float targetDistance = PlayerDirection.distance;
+
         Vector3 crosshairPosition = Crosshair.Instance.transform.position;
         // Cast the first ray from the camera to the mouse position to get target point
 
@@ -374,8 +376,6 @@ public abstract class BaseGun : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             expectedHitPoint = hit.point;
         }
-        
-        Vector3 shootingDirection = (expectedHitPoint - firePoint.position).normalized;
 
         // Convert MOA to radians
         float spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
@@ -384,6 +384,9 @@ public abstract class BaseGun : MonoBehaviour
         }
         // Calculate the spread based on the distance to the target
         float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
+
+        
+        Vector3 shootingDirection = (expectedHitPoint - firePoint.position).normalized;
         // Apply random spread
         shootingDirection.x += Random.Range(-spreadAtDistance, spreadAtDistance);
         shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
@@ -424,98 +427,9 @@ public abstract class BaseGun : MonoBehaviour
         }
         fireModeList = fireModes.ToArray();
     }
-    private void switchFireMode() {
+    public void switchFireMode() {
         int currentIndex = System.Array.IndexOf(fireModeList, currentFireMode);
         int nextIndex = (currentIndex + 1) % fireModeList.Length;
         currentFireMode = fireModeList[nextIndex];
-    }
-    // Update the UI elements
-    private void updateUI () {
-        updateAmmoText();
-        updateChamberUI();
-        updateFireMode();
-    }
-    private void updateAmmoText() {
-        int currentAmmo = currentAmmoInMag + currentAmmoInChamber;
-        ammoCountUI.text = currentAmmo.ToString();
-        while (ammoCountUI.text.Length < 2) {
-            ammoCountUI.text = "0" + ammoCountUI.text;
-        }
-    }
-
-    private float currentReloadRotation = 0;
-    private void updateChamberUI() {
-        if (currentAmmoInChamber <= 0) {
-            chamberUI.color = new Color(1f, 1f, 1f, 0.5f);
-            chargeUI.color = new Color(1f, 1f, 1f, 0.5f);
-        }
-        else {
-            chamberUI.color = new Color(1f, 1f, 1f, 1f);
-            chargeUI.color = new Color(1f, 1f, 1f, 1f);
-        }
-        if (reloading) {
-            chargeUI.color = new Color(1f, 1f, 1f, 0f);
-            ReloadingUI.color = new Color(1f, 1f, 1f, 1f);
-            currentReloadRotation += 1; 
-            ReloadingUI.transform.rotation = Quaternion.Euler(0, 0, currentReloadRotation);
-        } else {
-            ReloadingUI.color = new Color(1f, 1f, 1f, 0f);
-        }
-    }
-
-    private void updateFireMode() {
-        fireModeUI.text = currentFireMode.ToString().ToUpper();
-    }
-    public void getReferences () {
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null) {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
-
-        if (Player == null) {
-            Player = GameObject.Find("Player").transform;
-        }
-        if (Player == null) {
-            Debug.LogError("Player not found!");
-        }
-
-        rotateAround = gameObject.AddComponent<RotateAround>();
-        rotateAround.target = Player;
-        rotateAround.offsetPosition = new Vector3(0, 0, -1);
-
-        string[] uiElementNames = { "Ammo Count UI", "Chamber UI", "Charge UI", "Fire Mode UI", "Gun Name UI", "Reloading UI" };
-        foreach (string uiElementName in uiElementNames) {
-            GameObject uiObject = GameObject.Find(uiElementName);
-            if (uiObject != null) {
-                switch (uiElementName) {
-                    case "Ammo Count UI":
-                        ammoCountUI = uiObject.GetComponent<TextMeshProUGUI>();
-                        Debug.Log("Ammo Count GameObject found!");
-                        break;
-                    case "Chamber UI":
-                        chamberUI = uiObject.GetComponent<SVGImage>();
-                        Debug.Log("Chamber UI GameObject found!");
-                        break;
-                    case "Charge UI":
-                        chargeUI = uiObject.GetComponent<SVGImage>();
-                        Debug.Log("Charge UI GameObject found!");
-                        break;
-                    case "Fire Mode UI":
-                        fireModeUI = uiObject.GetComponent<TextMeshProUGUI>();
-                        Debug.Log("Fire Mode UI GameObject found!");
-                        break;
-                    case "Gun Name UI":
-                        gunNameUI = uiObject.GetComponent<TextMeshProUGUI>();
-                        Debug.Log("Gun Name UI GameObject found!");
-                        break;
-                    case "Reloading UI":
-                        ReloadingUI = uiObject.GetComponent<RawImage>();
-                        Debug.Log("Reloading UI GameObject found!");
-                        break;
-                }
-            } else {
-                Debug.LogError($"{uiElementName} GameObject not found!");
-            }
-        }
-    }
+    } 
 }

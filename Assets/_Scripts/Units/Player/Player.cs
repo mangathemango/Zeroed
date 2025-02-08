@@ -1,70 +1,74 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {   
     [Header("Movement")]
     public float dashSpeed = 20.0f;
-    public float dashCooldown = 1f;
+    public float dashCooldownSeconds = 1f;
     public float maxSpeed = 10.0f;
+    public int maxDashNum = 2;
 
+    public float currentDashCount = 0;
     private float currentSpeed;
-    private float dashTime = 0;
     private Rigidbody rb;
-    private float moveHorizontal;
-    private float moveVertical;
-    private Vector3 dashMovement;
+    public float moveHorizontal;
+    public float moveVertical;
+    Vector3 moveDirection;
+    Vector3 dashDirection;
 
     [Header("Equipment")]
-    public GameObject weapon;
+    public GameObject weaponPrefab;
+    [System.NonSerialized] public GameObject currentWeapon;
 
     void Start()
-    {
+    {   
+        currentDashCount = maxDashNum;
         rb = GetComponent<Rigidbody>();
         holdWeapon();
     }
 
     void holdWeapon() {
-        Instantiate(weapon, transform.position, transform.rotation, transform);
-        BaseGun gun = weapon.GetComponent<BaseGun>();
+        currentWeapon = Instantiate(weaponPrefab, transform.position, transform.rotation, transform);
+        BaseGun gun = currentWeapon.GetComponent<BaseGun>();
         if (gun != null) {
-            gun.Player = transform;
+            gun.player = transform;
         }
     }
 
     void Update()
     {
-        moveHorizontal = Input.GetAxisRaw("Horizontal");
-        moveVertical = Input.GetAxisRaw("Vertical");
-
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        moveDirection = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized;
         // rotate momement 45 degrees to the left
-        movement = Quaternion.Euler(0, 45, 0) * movement;
+        moveDirection = Quaternion.Euler(0, 45, 0) * moveDirection;
 
-        if (movement.magnitude > 0)
+        if (moveDirection.magnitude > 0)
         {
             currentSpeed = maxSpeed;
-            dashMovement = movement;
+            dashDirection = moveDirection;
         }
         else
         {
             currentSpeed = 0;
         }
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && dashTime <= 0)
-        {
-            dashTime = dashCooldown;
-            rb.AddForce(dashMovement * dashSpeed, ForceMode.Impulse);
+        rb.AddForce(moveDirection * currentSpeed);
+        if (currentDashCount < maxDashNum) {
+            currentDashCount += Time.deltaTime / dashCooldownSeconds;
+        } else {
+            currentDashCount = maxDashNum;
         }
-        if (dashTime > 0)
-        {
-            dashTime -= Time.deltaTime;
-        }
-
-        rb.AddForce(movement * currentSpeed);
     }
 
+    public IEnumerator Dash() {
+        if (currentDashCount <= 0) {
+            yield break;
+        }
+        currentDashCount--;
+        rb.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
+        yield break;
+    }
     public RaycastHit GetPlayerDirection() {
         Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
         RaycastHit hit;
