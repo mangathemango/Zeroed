@@ -209,12 +209,11 @@ public abstract class BaseGun : MonoBehaviour
 
 
     IEnumerator Aim() {
-        aimCoroutineRunning = true;
-        if (cameraZoomedIn) {
+        if (aimCoroutineRunning) {
             yield break;
         }
-        Debug.Log("Aiming");
-        cameraZoomedIn = true;
+        float originalOthrographicSize = Camera.main.orthographicSize;
+        aimCoroutineRunning = true;
         
         Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
         RaycastHit hit;
@@ -223,27 +222,27 @@ public abstract class BaseGun : MonoBehaviour
             Camera.main.GetComponent<LookAt>().target = null;
             Camera.main.GetComponent<Follow>().targetPosition = hit.point + Camera.main.GetComponent<Follow>().offset;
             Camera.main.GetComponent<LookAt>().targetPosition = hit.point;
+            
             Crosshair.Instance.targetPosition = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-            float targetOrthographicSize = 5; // Set your desired zoom level here
-            float zoomSpeed = -4; // Set your desired zoom speed here
-            while (Camera.main.orthographicSize > targetOrthographicSize) {
-                Camera.main.orthographicSize += zoomSpeed * Time.deltaTime;
-                zoomSpeed += 4 * Time.deltaTime;
-                if (!aiming || !Input.GetMouseButton(1)) {
-                    break;
-                }
+            
+            float targetOrthographicSize = 5;
+            float zoomRate = 4; 
+            while (aiming && Camera.main.orthographicSize > targetOrthographicSize) {
+                Camera.main.orthographicSize -= zoomRate * Time.deltaTime;
+                zoomRate -= zoomRate * Time.deltaTime;
                 yield return null;
             }
             Camera.main.orthographicSize = targetOrthographicSize;
         }
-        yield return new WaitUntil(() => !aiming || !Input.GetMouseButton(1));
+        yield return new WaitUntil(() => !aiming);
         cameraZoomedIn = false;
+
         Camera.main.GetComponent<LookAt>().target = Player;
         Camera.main.GetComponent<Follow>().target = Player;
-        Crosshair.Instance.transform.position = hit.point;
-        aimCoroutineRunning = false;
-        Camera.main.orthographicSize = 7;
+
+        Camera.main.orthographicSize = originalOthrographicSize;
         
+        aimCoroutineRunning = false;
     }
 
     /// <summary>
@@ -278,6 +277,7 @@ public abstract class BaseGun : MonoBehaviour
         if (Physics.Raycast(screenRay, out hit)) {
             targetDirection = hit.point - Player.transform.position;
         }
+
         if (Physics.Raycast(Player.transform.position, targetDirection, out hit, meleeRange)) {
             GameObject hitObject = hit.collider.gameObject;
             if (hitObject.GetComponent<BaseEnemy>() != null) {
@@ -286,9 +286,7 @@ public abstract class BaseGun : MonoBehaviour
             meleeReady = false;
             StartCoroutine(resetMelee());
             audioSource.PlayOneShot(meleeHitSFX, soundSignature / 2);  
-            Debug.Log("Melee hit: " + hit.collider.gameObject.name);
         } else {
-            Debug.Log("Melee Attack thrown, missed");
             audioSource.PlayOneShot(meleeMissSFX, soundSignature / 2);  
         }
 
@@ -313,8 +311,6 @@ public abstract class BaseGun : MonoBehaviour
         yield return new WaitUntil(() => !Input.GetMouseButton(1));
         aiming = false;
     }
-
-
     IEnumerator ResetAutoFireReady() {
         yield return new WaitForSeconds(60 / shotsPerMinute);
         autoFireReady = true;
@@ -369,18 +365,13 @@ public abstract class BaseGun : MonoBehaviour
         Vector3 expectedHitPoint = new Vector3();
         Vector3 targetPoint = new Vector3();
         float targetDistance = 1f;
+        RaycastHit PlayerDirection = Player.GetComponent<Player>().GetPlayerDirection();
         Vector3 crosshairPosition = Crosshair.Instance.transform.position;
         // Cast the first ray from the camera to the mouse position to get target point
-        Ray ray = Camera.main.ScreenPointToRay(crosshairPosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) {
-            targetPoint = hit.point;
-            targetDistance = hit.distance;
-        }
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
-        ray = new Ray(firePoint.position, targetPoint - firePoint.position);
-        if (Physics.Raycast(ray, out hit)) {
+        Ray ray = new Ray(firePoint.position, targetPoint - firePoint.position);
+        if (Physics.Raycast(ray, out RaycastHit hit)) {
             expectedHitPoint = hit.point;
         }
         
@@ -409,13 +400,13 @@ public abstract class BaseGun : MonoBehaviour
         }
 
         // Move the crosshair to random direction
-        Crosshair.Instance.recoil = new Vector3(
+        Crosshair.Instance.Recoil(new Vector3(
             Random.Range(-recoilX, recoilX) * 10,
             Random.Range(-recoilY, recoilY) * 10,
             0
-        );
+        ));
     }
-    
+
     private FireMode[] fireModeList;
     private void setupFireModes() {
         List<FireMode> fireModes = new List<FireMode>();

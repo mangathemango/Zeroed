@@ -6,7 +6,6 @@ public class Crosshair : Singleton<Crosshair>
     [SerializeField] private float smoothTime = 0.1f;
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
-    public Vector3 recoil;
     private Vector3 velocity = Vector3.zero;
     public Vector3 targetPosition = Vector3.zero;
     private Camera mainCamera;
@@ -27,7 +26,7 @@ public class Crosshair : Singleton<Crosshair>
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
         // Calculate target position based on mouse movement
-        targetPosition = targetPosition + new Vector3(mouseX, mouseY, 0) + recoil;
+        targetPosition = targetPosition + new Vector3(mouseX, mouseY, 0);
         targetPosition.x = Mathf.Clamp(targetPosition.x, 0, Screen.width);
         targetPosition.y = Mathf.Clamp(targetPosition.y, 0, Screen.height);
 
@@ -39,6 +38,10 @@ public class Crosshair : Singleton<Crosshair>
             Mathf.Clamp(transform.position.y, 0, Screen.height),
             0
         );
-        recoil = Vector3.zero;
+    }
+
+    public void Recoil(Vector3 recoil)
+    {
+        targetPosition += recoil;
     }
 }

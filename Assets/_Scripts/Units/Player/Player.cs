@@ -19,9 +19,6 @@ public class Player : MonoBehaviour
     [Header("Equipment")]
     public GameObject weapon;
 
-    [Header("References")]
-    public Transform DashCDBar;
-
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -65,8 +62,16 @@ public class Player : MonoBehaviour
             dashTime -= Time.deltaTime;
         }
 
-        DashCDBar.localScale = new Vector3(0.1f - (dashTime)/(dashCooldown) * 0.1f,DashCDBar.localScale.y,DashCDBar.localScale.z);
-
         rb.AddForce(movement * currentSpeed);
+    }
+
+    public RaycastHit GetPlayerDirection() {
+        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit)) {
+            return hit;
+        } else {
+            return new RaycastHit();
+        }
     }
 }
