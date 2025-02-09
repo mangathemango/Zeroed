@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 832208654854158620}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.03, z: 0}
+  m_LocalPosition: {x: 0, y: -0.05, z: 0.777}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -60,8 +60,8 @@ Transform:
   m_GameObject: {fileID: 1776013771887272641}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.48, y: 2.68, z: 0}
-  m_LocalScale: {x: 0.6116982, y: 0.5657797, z: 0.5739987}
+  m_LocalPosition: {x: -3.48, y: 2.68, z: 0.25}
+  m_LocalScale: {x: 0.6116982, y: 0.21825518, z: 1.1885217}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2669274604477488164}
@@ -133,7 +133,7 @@ MonoBehaviour:
   ammoType: {fileID: 6661516185590720827, guid: c028ae1e7150b0f4d8e758263bd236e7, type: 3}
   ammoCapacity: 20
   mass: 0.1
-  muzzleVelocity: 300
+  muzzleVelocity: 52
   soundSignature: 1
   triggerPullTimeSeconds: 0
   switchTimeSeconds: 1
@@ -158,8 +158,9 @@ MonoBehaviour:
   pointFireSpreadMOA: 1
   adsSpreadMOA: 0.1
   pelletSpreadMOA: 2
-  recoilY: 0.35
+  recoilY: 3.51
   recoilX: 0.35
+  Optics: 1
   meleeDamage: 10
   meleeRange: 2
   meleeKnockback: 1
@@ -172,6 +173,20 @@ MonoBehaviour:
   chargeSFX: {fileID: 8300000, guid: dea3910796337fb43af038b79056450f, type: 3}
   meleeMissSFX: {fileID: 8300000, guid: f7910e15066f09f4381e23dfc1d79cf4, type: 3}
   meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
+  playerPosition: {fileID: 0}
+  audioSource: {fileID: 0}
+  rotateAround: {fileID: 0}
+  currentFireMode: 0
+  meleeReady: 1
+  autoFireReady: 1
+  semiFireReady: 1
+  burstFireReady: 1
+  currentAmmoInMag: 0
+  currentAmmoInChamber: 0
+  triggerPressed: 0
+  charging: 0
+  reloading: 0
+  aiming: 0
 --- !u!136 &8012230581373431905
 CapsuleCollider:
   m_ObjectHideFlags: 0

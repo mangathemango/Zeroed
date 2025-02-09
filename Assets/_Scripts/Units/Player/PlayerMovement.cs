@@ -5,36 +5,43 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour
-{   
+{
     [Header("Movement")]
     public float dashSpeed = 20.0f;
     public float dashCooldownSeconds = 1f;
     public float maxSpeed = 10.0f;
     public int maxDashNum = 2;
 
-    [NonSerialized] public float currentDashCount = 0;
-    [NonSerialized] public float moveHorizontal;
-    [NonSerialized] public float moveVertical;
-    private float currentSpeed;
-    private Vector3 moveDirection;
-    private Vector3 dashDirection;
+    private float currentDashCount = 0;
+    public float getCurrentDashCount {
+        get {return currentDashCount;} 
+    }
+    public float moveHorizontal {get; set;}
+    public float moveVertical {get; set;}
+
+    [NonSerialized] private float currentSpeed;
+    [NonSerialized] private Vector3 moveDirection;
+    [NonSerialized] private Vector3 dashDirection;
+    [NonSerialized] private Vector3 forwardDirection;
 
     [Header("References")]
-
     [NonSerialized] public GameObject currentWeapon;
-    private Rigidbody rb;
+    [NonSerialized] private Rigidbody rb;
 
     void Start()
-    {   
+    {
         currentDashCount = maxDashNum;
         rb = GetComponent<Rigidbody>();
     }
 
     void Update()
-    {
+    {   
+        forwardDirection = Camera.main.transform.forward;
+        forwardDirection.y = 0;
         moveDirection = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized;
-        // rotate momement 45 degrees to the left
-        moveDirection = Quaternion.Euler(0, 45, 0) * moveDirection;
+
+        moveDirection = Quaternion.LookRotation(forwardDirection) * moveDirection;
+        
 
         if (moveDirection.magnitude > 0)
         {
@@ -45,29 +52,45 @@ public class PlayerMovement : MonoBehaviour
         {
             currentSpeed = 0;
         }
-        if (currentDashCount < maxDashNum) {
+        if (currentDashCount < maxDashNum)
+        {
             currentDashCount += Time.deltaTime / dashCooldownSeconds;
-        } else {
+        }
+        else
+        {
             currentDashCount = maxDashNum;
         }
         rb.AddForce(moveDirection * currentSpeed);
     }
 
-    public IEnumerator Dash() {
-        if (currentDashCount <= 0) {
+    public IEnumerator Dash()
+    {
+        if (currentDashCount <= 0)
+        {
             yield break;
         }
         currentDashCount--;
         rb.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
         yield break;
     }
-    public RaycastHit GetPlayerDirection() {
+
+    
+    public RaycastHit GetPlayerDirection()
+    {
         Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) {
+        if (Physics.Raycast(ray, out hit))
+        {
             return hit;
-        } else {
+        }
+        else
+        {
             return new RaycastHit();
         }
+    }
+
+    public Vector3 ConvertToPlayerDirection(Vector3 direction)
+    {
+        return Quaternion.LookRotation(forwardDirection) * direction;
     }
 }

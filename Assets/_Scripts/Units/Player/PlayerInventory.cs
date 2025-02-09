@@ -18,7 +18,7 @@ public class PlayerInventory : MonoBehaviour
         currentWeapon = Instantiate(weaponPrefab, transform.position, transform.rotation, transform);
         BaseGun gun = currentWeapon.GetComponent<BaseGun>();
         if (gun != null) {
-            gun.player = transform;
+            gun.playerPosition = transform;
         }
     }
 }

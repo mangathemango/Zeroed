@@ -6,9 +6,9 @@ public class Crosshair : Singleton<Crosshair>
     [SerializeField] private float smoothTime = 0.1f;
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
+
     private Vector3 velocity = Vector3.zero;
     public Vector3 targetPosition = Vector3.zero;
-    private Camera mainCamera;
 
     void Start()
     {
@@ -16,7 +16,6 @@ public class Crosshair : Singleton<Crosshair>
         Cursor.lockState = CursorLockMode.Locked;
         transform.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         targetPosition = transform.position;
-        mainCamera = Camera.main;
     }
 
     void Update()

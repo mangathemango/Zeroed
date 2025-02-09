@@ -7,13 +7,14 @@ public class EnemySpawner : MonoBehaviour
     public Transform corner1;
     public Transform corner2;
     public GameObject enemyPrefab;
+    private GameObject enemyContainer;
     public float spawnRate = 1;
 
     private bool readyToSpawn = true;
     // Start is called before the first frame update
     void Start()
     {
-        
+        enemyContainer = GameObject.Find("Enemies");
     }
 
     // Update is called once per frame
@@ -33,6 +34,6 @@ public class EnemySpawner : MonoBehaviour
 
     void spawnEnemy() {
         Vector3 spawnPosition = new Vector3(Random.Range(corner1.position.x, corner2.position.x), 2, Random.Range(corner1.position.z, corner2.position.z));
-        Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        Instantiate(enemyPrefab, spawnPosition, Quaternion.identity, enemyContainer.transform);
     }
 }

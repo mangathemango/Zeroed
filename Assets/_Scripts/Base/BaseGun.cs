@@ -128,7 +128,8 @@ public abstract class BaseGun : MonoBehaviour
     public AudioClip meleeMissSFX;
     public AudioClip meleeHitSFX;
 #if DEBUG
-    public Transform player;
+    public PlayerMovement playerMovement;
+    public Transform playerPosition;
     public AudioSource audioSource;
     public RotateAround rotateAround;
     public FireMode currentFireMode;
@@ -166,13 +167,15 @@ public abstract class BaseGun : MonoBehaviour
 
     protected virtual void Start()
     {
-        player = GameObject.Find("Player").transform;
+        GameObject player = GameObject.Find("Player");
+        playerPosition = player.transform;
+        playerMovement = player.GetComponent<PlayerMovement>();
         currentFireMode = defaultFireMode;
         currentAmmoInMag = ammoCapacity - 1;
         currentAmmoInChamber = 1;
         setupFireModes();
         rotateAround = gameObject.AddComponent<RotateAround>();
-        rotateAround.target = player;
+        rotateAround.target = playerPosition;
         rotateAround.offsetPosition = new Vector3(0, 0, -1);
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) {
@@ -184,7 +187,7 @@ public abstract class BaseGun : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {   
-        transform.rotation = player.rotation;
+        transform.rotation = playerPosition.rotation;
         if (triggerPressed) {
             HandleTriggerPressed();
         }
@@ -212,7 +215,31 @@ public abstract class BaseGun : MonoBehaviour
             yield break;
         }
         aimCoroutineRunning = true;
-        
+        float scopeMultiplier = 1.0f;
+        switch (Optics) {
+            case OpticType.x1:
+                scopeMultiplier = 1.0f;
+                break;
+            case OpticType.x2:
+                scopeMultiplier = 2.0f;
+                break;
+            case OpticType.x3:
+                scopeMultiplier = 3.0f;
+                break;
+            case OpticType.x4:
+                scopeMultiplier = 4.0f;
+                break;
+            default:
+                scopeMultiplier = 1.0f;
+                break;
+        }
+        CameraManager cameraManager = Camera.main.GetComponent<CameraManager>();
+        while (aiming) {
+            Vector3 aimOffset = Crosshair.Instance.GetDistanceFromCenter() * scopeMultiplier * 10;
+            cameraManager.playerOffset = aimOffset;
+            yield return null;
+        }
+        cameraManager.playerOffset = Vector3.zero;
         aimCoroutineRunning = false;
     }
 
@@ -242,10 +269,10 @@ public abstract class BaseGun : MonoBehaviour
             Debug.Log("Melee not ready");
             return;
         }
-        Vector3 targetDirection = player.GetComponent<PlayerMovement>().GetPlayerDirection().point - player.transform.position;
+        Vector3 targetDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection().point - playerPosition.transform.position;
         bool meleeHit = false;
         RaycastHit hit;
-        if (Physics.Raycast(player.transform.position, targetDirection, out hit, meleeRange)) {
+        if (Physics.Raycast(playerPosition.transform.position, targetDirection, out hit, meleeRange)) {
             meleeHit = true;
         }
 
@@ -344,7 +371,7 @@ public abstract class BaseGun : MonoBehaviour
         }
 
         Vector3 expectedHitPoint = new Vector3();;
-        RaycastHit PlayerDirection = player.GetComponent<PlayerMovement>().GetPlayerDirection();
+        RaycastHit PlayerDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection();
         Vector3 targetPoint = PlayerDirection.point;
         float targetDistance = PlayerDirection.distance;
 
@@ -385,7 +412,7 @@ public abstract class BaseGun : MonoBehaviour
         // Move the crosshair to random direction
         Crosshair.Instance.Recoil(new Vector3(
             Random.Range(-recoilX, recoilX) * 10,
-            Random.Range(-recoilY, recoilY) * 10,
+            Random.Range(-recoilY / 2, recoilY * 1.5f) * 10,
             0
         ));
     }
