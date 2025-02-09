@@ -15,7 +15,7 @@ class CompressedMangifera: BaseBullet {
     void Update() {
         if (hit && firstHit) {
             if (stopAfterCollision) {
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
                 GetComponent<Rigidbody>().mass = 0;
                 GetComponent<Rigidbody>().useGravity = false;
                 GetComponent<SphereCollider>().enabled = false;
