@@ -300,10 +300,10 @@ public abstract class BaseGun : MonoBehaviour
             audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
         }
 
-        if (triggerPullTimeSeconds > 0) {
-            yield return new WaitForSeconds(triggerPullTimeSeconds);
-        }
-        triggerPressed = true;
+        yield return new WaitForSeconds(triggerPullTimeSeconds);
+        if (Input.GetMouseButtonDown(0)) {
+            triggerPressed = true;
+        }        
         yield return new WaitUntil(() => !Input.GetMouseButton(0));
         triggerPressed = false;
         pressTriggerCoroutineRunning = false;
