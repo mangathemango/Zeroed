@@ -12,7 +12,10 @@ public class PlayerInventory : MonoBehaviour
 
     private void Update()
     {
-
+        if (currentWeapon == null)
+        {
+            holdWeapon();
+        }
     }
     void holdWeapon() {
         currentWeapon = Instantiate(weaponPrefab, transform.position, transform.rotation, transform);
