@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CameraManager : MonoBehaviour {
+public class CameraManager : Singleton<CameraManager> {
     public Transform cameraFollow;
     public Vector3 offset;
     public float smoothTime = 0.3f;
@@ -25,7 +25,7 @@ public class CameraManager : MonoBehaviour {
 
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref velocity, smoothTime);
     
-        transform.position = cameraFollow.position + offset;
-        transform.LookAt(cameraFollow);
+        Camera.main.transform.position = cameraFollow.position + offset;
+        Camera.main.transform.LookAt(cameraFollow);
     }
 }

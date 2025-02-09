@@ -233,12 +233,10 @@ public abstract class BaseGun : MonoBehaviour
                 scopeMultiplier = 1.0f;
                 break;
         }
-        CameraManager cameraManager = Camera.main.GetComponent<CameraManager>();
+        CameraManager cameraManager = CameraManager.Instance.GetComponent<CameraManager>();
         while (aiming) {
-            Vector3 aimOffset = Crosshair.Instance.GetPlacementDistanceFromCenter() * scopeMultiplier;
-            Vector3 minAimOffset = Crosshair.Instance.GetMaxDistanceFromCenter(aimOffset) * (scopeMultiplier - 1);
-            Debug.Log(minAimOffset);
-            cameraManager.playerOffset = (minAimOffset + aimOffset) * 10;
+            Vector3 aimOffset = Crosshair.Instance.GetOriginDistanceFromCenter() * scopeMultiplier;
+            cameraManager.playerOffset = aimOffset * 10;
             yield return null;
         }
         cameraManager.playerOffset = Vector3.zero;
