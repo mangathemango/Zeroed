@@ -215,7 +215,7 @@ public abstract class BaseGun : MonoBehaviour
             yield break;
         }
         aimCoroutineRunning = true;
-        float scopeMultiplier = 1.0f;
+        float scopeMultiplier;
         switch (Optics) {
             case OpticType.x1:
                 scopeMultiplier = 1.0f;
@@ -235,8 +235,10 @@ public abstract class BaseGun : MonoBehaviour
         }
         CameraManager cameraManager = Camera.main.GetComponent<CameraManager>();
         while (aiming) {
-            Vector3 aimOffset = Crosshair.Instance.GetDistanceFromCenter() * scopeMultiplier * 10;
-            cameraManager.playerOffset = aimOffset;
+            Vector3 aimOffset = Crosshair.Instance.GetPlacementDistanceFromCenter() * scopeMultiplier;
+            Vector3 minAimOffset = Crosshair.Instance.GetMaxDistanceFromCenter(aimOffset) * (scopeMultiplier - 1);
+            Debug.Log(minAimOffset);
+            cameraManager.playerOffset = (minAimOffset + aimOffset) * 10;
             yield return null;
         }
         cameraManager.playerOffset = Vector3.zero;
@@ -301,7 +303,7 @@ public abstract class BaseGun : MonoBehaviour
         }
 
         yield return new WaitForSeconds(triggerPullTimeSeconds);
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButton(0)) {
             triggerPressed = true;
         }        
         yield return new WaitUntil(() => !Input.GetMouseButton(0));
@@ -374,8 +376,6 @@ public abstract class BaseGun : MonoBehaviour
         RaycastHit PlayerDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection();
         Vector3 targetPoint = PlayerDirection.point;
         float targetDistance = PlayerDirection.distance;
-
-        Vector3 crosshairPosition = Crosshair.Instance.transform.position;
         // Cast the first ray from the camera to the mouse position to get target point
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
@@ -408,13 +408,8 @@ public abstract class BaseGun : MonoBehaviour
         if (fireSFX != null) {
             audioSource.PlayOneShot(fireSFX, soundSignature);
         }
-
         // Move the crosshair to random direction
-        Crosshair.Instance.Recoil(new Vector3(
-            Random.Range(-recoilX, recoilX) * 10,
-            Random.Range(-recoilY / 2, recoilY * 1.5f) * 10,
-            0
-        ));
+        Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
     }
 
     private FireMode[] fireModeList;

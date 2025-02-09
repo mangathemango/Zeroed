@@ -14,7 +14,7 @@ public class LookAtCursor : MonoBehaviour
     void LateUpdate()
     {
         // Get mouse position in 3d as Ray
-        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
+        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.placement.position);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {   
             Vector3 targetPosition = hit.point;

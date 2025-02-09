@@ -77,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
     
     public RaycastHit GetPlayerDirection()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
+        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.placement.position);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
