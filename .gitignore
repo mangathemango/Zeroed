@@ -115,5 +115,5 @@ crashlytics-build.properties
 [Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bundle.manifest.meta.meta.meta.meta
 [Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bundle.manifest.meta.meta.meta.meta.meta
 [Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bundle.meta.meta.meta.meta.meta
-Assets/Objects/Guns/MangoLauncher.prefab
-Assets/Objects/Guns/MangoLauncher.prefab.meta
+Assets/Prefabs/Guns/MangoLauncher.prefab
+Assets/Prefabs/Guns/MangoLauncher.prefab.meta
