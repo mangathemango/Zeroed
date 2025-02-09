@@ -7,7 +7,6 @@
 [Ll]ogs/
 [Mm]emoryCaptures/
 [Uu]serSettings/
-Assets/Objects/Guns/Mango Launcher.prefab
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 #!/[Aa]ssets/**/*.meta
@@ -116,3 +115,4 @@ crashlytics-build.properties
 [Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bundle.manifest.meta.meta.meta.meta
 [Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bundle.manifest.meta.meta.meta.meta.meta
 [Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bundle.meta.meta.meta.meta.meta
+Assets/Objects/Guns/Mango Launcher.prefab
