@@ -301,7 +301,7 @@ public abstract class BaseGun : MonoBehaviour
         }
 
         yield return new WaitForSeconds(triggerPullTimeSeconds);
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButton(0)) {
             triggerPressed = true;
         }        
         yield return new WaitUntil(() => !Input.GetMouseButton(0));
@@ -374,8 +374,6 @@ public abstract class BaseGun : MonoBehaviour
         RaycastHit PlayerDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection();
         Vector3 targetPoint = PlayerDirection.point;
         float targetDistance = PlayerDirection.distance;
-
-        Vector3 crosshairPosition = Crosshair.Instance.transform.position;
         // Cast the first ray from the camera to the mouse position to get target point
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
@@ -411,9 +409,9 @@ public abstract class BaseGun : MonoBehaviour
 
         // Move the crosshair to random direction
         Crosshair.Instance.Recoil(new Vector3(
-            Random.Range(-recoilX, recoilX) * 10,
-            Random.Range(-recoilY / 2, recoilY * 1.5f) * 10,
-            0
+            recoilX * Random.Range(-1f, 1f),
+            recoilY * Random.Range(-1f, 1f),
+            PlayerDirection.point.z
         ));
     }
 
