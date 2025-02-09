@@ -161,7 +161,7 @@ MonoBehaviour:
   pointFireSpreadMOA: 1
   adsSpreadMOA: 0.1
   pelletSpreadMOA: 2
-  recoilY: 0
+  recoilY: 2.3
   recoilX: 0
   Optics: 2
   meleeDamage: 10
