@@ -9,7 +9,7 @@ public class SpitBall : BaseBullet
     public bool stopAfterCollision = true;
     private bool firstHit = true;
     // Start is called before the first frame update
-    void Start()
+    override protected void Start()
     {
         SetupBullet();
         Invoke("Destroy", despawnTime);
@@ -30,7 +30,6 @@ public class SpitBall : BaseBullet
                 float damage = 10f;
                 hitObject.GetComponent<BaseEnemy>().TakeDamage(damage);
             }
-            Debug.Log("Hit object: " + hitObject.name);
             Invoke("Destroy", despawnOnCollisionTime);  
             firstHit = false;
         }

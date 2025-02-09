@@ -44,7 +44,7 @@ public abstract class BaseGun : MonoBehaviour
 {
     [Header("General")]
     public string gunName;
-    public GameObject ammoType;
+    public GameObject ammoPrefab;
     public int ammoCapacity = 10;
     [Range (0.0f, 10.0f)]
     public float mass = 0.1f;
@@ -397,7 +397,7 @@ public abstract class BaseGun : MonoBehaviour
         shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
         
         // Instantiate the bullet
-        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
+        GameObject bullet = Instantiate(ammoPrefab, firePoint.transform.position, transform.rotation);
         bullet.GetComponent<Rigidbody>().linearVelocity = shootingDirection * muzzleVelocity;
         bullet.GetComponent<BaseBullet>().source = gameObject;
 

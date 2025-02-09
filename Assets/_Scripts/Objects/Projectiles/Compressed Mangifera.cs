@@ -7,7 +7,7 @@ class CompressedMangifera: BaseBullet {
     public float explosionForce = 5f;
     public bool stopAfterCollision = true;
     private bool firstHit = true;
-    void Start() {
+    override protected void Start() {
         SetupBullet();
         Invoke("Destroy", despawnTime);
     }
@@ -29,7 +29,6 @@ class CompressedMangifera: BaseBullet {
                     hitCollider.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRadius);
                 }
             }
-            Debug.Log("Hit object: " + hitObject.name);
             Invoke("Destroy", despawnOnCollisionTime);  
             firstHit = false;
         }

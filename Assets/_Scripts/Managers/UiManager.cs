@@ -30,27 +30,21 @@ public class UiUpdater: MonoBehaviour {
                 switch (uiElementName) {
                     case "Ammo Count UI":
                         ammoCountUI = uiObject.GetComponent<TextMeshProUGUI>();
-                        Debug.Log("Ammo Count GameObject found!");
                         break;
                     case "Chamber UI":
                         chamberUI = uiObject.GetComponent<SVGImage>();
-                        Debug.Log("Chamber UI GameObject found!");
                         break;
                     case "Charge UI":
                         chargeUI = uiObject.GetComponent<SVGImage>();
-                        Debug.Log("Charge UI GameObject found!");
                         break;
                     case "Fire Mode UI":
                         fireModeUI = uiObject.GetComponent<TextMeshProUGUI>();
-                        Debug.Log("Fire Mode UI GameObject found!");
                         break;
                     case "Gun Name UI":
                         gunNameUI = uiObject.GetComponent<TextMeshProUGUI>();
-                        Debug.Log("Gun Name UI GameObject found!");
                         break;
                     case "Reloading UI":
                         ReloadingUI = uiObject.GetComponent<RawImage>();
-                        Debug.Log("Reloading UI GameObject found!");
                         break;
                 }
             } else {

@@ -24,4 +24,7 @@ public class BaseBullet: MonoBehaviour {
     public void Destroy() {
         Destroy(gameObject);
     }
+    protected virtual void Start() {
+        SetupBullet();
+    }
 }
