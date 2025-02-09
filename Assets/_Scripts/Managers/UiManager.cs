@@ -4,7 +4,7 @@ using Unity.VectorGraphics;
 using UnityEngine.UI;
 
 public class UiUpdater: MonoBehaviour {
-    private Player player;
+    private PlayerInventory playerInventory;
     private GameObject currentWeapon; 
     private TextMeshProUGUI ammoCountUI;
     private TextMeshProUGUI fireModeUI;
@@ -15,13 +15,13 @@ public class UiUpdater: MonoBehaviour {
     private BaseGun currentGun;
     private void Start () {
 
-        if (player == null) {
-            player = GameObject.Find("Player").GetComponent<Player>();
+        if (playerInventory == null) {
+            playerInventory = GameObject.Find("Player").GetComponent<PlayerInventory>();
         }
-        if (player == null) {
+        if (playerInventory == null) {
             Debug.LogError("Player not found!");
         }
-        currentWeapon = player.currentWeapon;
+        currentWeapon = playerInventory.currentWeapon;
 
         string[] uiElementNames = { "Ammo Count UI", "Chamber UI", "Charge UI", "Fire Mode UI", "Gun Name UI", "Reloading UI" };
         foreach (string uiElementName in uiElementNames) {
@@ -60,14 +60,8 @@ public class UiUpdater: MonoBehaviour {
     }
 
     private void Update () {
-        if (player == null) {
-            player = GameObject.Find("Player").GetComponent<Player>();
-        }
-        if (player == null) {
-            Debug.LogError("Player not found!");
-        }
         if (currentWeapon == null) {
-            currentWeapon = player.currentWeapon;
+            currentWeapon = playerInventory.currentWeapon;
         }
         if (currentWeapon.GetComponent<BaseGun>() != null) {
             currentGun = currentWeapon.GetComponent<BaseGun>();

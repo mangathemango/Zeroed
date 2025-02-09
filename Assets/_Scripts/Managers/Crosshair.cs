@@ -40,6 +40,14 @@ public class Crosshair : Singleton<Crosshair>
         );
     }
 
+    public Vector3 GetDistanceFromCenter()
+    {
+        return new Vector3(
+            (transform.position.x - Screen.width / 2) / Screen.width,
+            (transform.position.y - Screen.height / 2) / Screen.height,
+            0
+        );
+    }
     public void Recoil(Vector3 recoil)
     {
         targetPosition += recoil;

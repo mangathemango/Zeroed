@@ -6,32 +6,36 @@ using Unity.VectorGraphics;
 using UnityEngine.UI;
 using System.Runtime.CompilerServices;
 using UnityEditor.Callbacks;
-using GunStuff;
+
 using UnityEditor.SceneManagement;
+public enum FireMode {
+    Semi,
+    Auto,
+    Burst
+}
+public enum ManualMode {
+    Bolt,
+    Pump
+}   
+public enum ShotType {
+    Single,
+    Spread,
+}
+public enum AmmoType {
+    _9x19mm,
+    __45ACP,
+    _5_7x28mm,
+    _5_56x45mm,
+    _7_62x51mmNATO,
+    _12_Gauge,
+}
 
-namespace GunStuff {
-    public enum FireMode {
-        Semi,
-        Auto,
-        Burst
-    }
-    public enum ManualMode {
-        Bolt,
-        Pump
-    }   
-    public enum ShotType {
-        Single,
-        Spread,
-    }
-    public enum AmmoType {
-        _9x19mm,
-        __45ACP,
-        _5_7x28mm,
-        _5_56x45mm,
-        _7_62x51mmNATO,
-        _12_Gauge,
-
-    }
+public enum OpticType {
+    None,
+    x1,
+    x2,
+    x3,
+    x4
 }
 
 // oh yeahs sure
@@ -104,6 +108,9 @@ public abstract class BaseGun : MonoBehaviour
     public float recoilY = 1.0f;
     [Range (0.0f, 10.0f)]
     public float recoilX = 1.0f;
+
+    [Header("Attachments")]
+    public OpticType Optics = OpticType.None;
 
     [Header("Melee")]
     public float meleeDamage = 10.0f;
@@ -204,34 +211,7 @@ public abstract class BaseGun : MonoBehaviour
         if (aimCoroutineRunning) {
             yield break;
         }
-        float originalOthrographicSize = Camera.main.orthographicSize;
         aimCoroutineRunning = true;
-        
-        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.transform.position);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) {
-            Camera.main.GetComponent<Follow>().target = null;
-            Camera.main.GetComponent<LookAt>().target = null;
-            Camera.main.GetComponent<Follow>().targetPosition = hit.point + Camera.main.GetComponent<Follow>().offset;
-            Camera.main.GetComponent<LookAt>().targetPosition = hit.point;
-            
-            Crosshair.Instance.targetPosition = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-            
-            float targetOrthographicSize = 5;
-            float zoomRate = 4; 
-            while (aiming && Camera.main.orthographicSize > targetOrthographicSize) {
-                Camera.main.orthographicSize -= zoomRate * Time.deltaTime;
-                zoomRate -= zoomRate * Time.deltaTime;
-                yield return null;
-            }
-            Camera.main.orthographicSize = targetOrthographicSize;
-        }
-        yield return new WaitUntil(() => !aiming);
-
-        Camera.main.GetComponent<LookAt>().target = player;
-        Camera.main.GetComponent<Follow>().target = player;
-
-        Camera.main.orthographicSize = originalOthrographicSize;
         
         aimCoroutineRunning = false;
     }
@@ -262,7 +242,7 @@ public abstract class BaseGun : MonoBehaviour
             Debug.Log("Melee not ready");
             return;
         }
-        Vector3 targetDirection = player.GetComponent<Player>().GetPlayerDirection().point - player.transform.position;
+        Vector3 targetDirection = player.GetComponent<PlayerMovement>().GetPlayerDirection().point - player.transform.position;
         bool meleeHit = false;
         RaycastHit hit;
         if (Physics.Raycast(player.transform.position, targetDirection, out hit, meleeRange)) {
@@ -364,7 +344,7 @@ public abstract class BaseGun : MonoBehaviour
         }
 
         Vector3 expectedHitPoint = new Vector3();;
-        RaycastHit PlayerDirection = player.GetComponent<Player>().GetPlayerDirection();
+        RaycastHit PlayerDirection = player.GetComponent<PlayerMovement>().GetPlayerDirection();
         Vector3 targetPoint = PlayerDirection.point;
         float targetDistance = PlayerDirection.distance;
 

@@ -2,26 +2,20 @@ using UnityEngine;
 
 public class PlayerInputHandler: Singleton<PlayerInputHandler>
 {
-    Player player;
+    PlayerInventory playerInventory;
+    PlayerMovement movement;
     BaseGun gun;
     private void Start()
     {
-        if (!GetComponent<Player>())
-        {
-            player = gameObject.AddComponent<Player>();
-        }
-        else
-        {
-            player = GetComponent<Player>();
-        }
+        playerInventory = GetComponent<PlayerInventory>();
+        movement = GetComponent<PlayerMovement>();
     }
     private void Update()
     {
         // Gun controls
-        gun = player.currentWeapon.GetComponent<BaseGun>();
+        gun = playerInventory.currentWeapon.GetComponent<BaseGun>();
         if (Input.GetMouseButtonDown(0)) {
             StartCoroutine(gun.PressTrigger());
-
         }
         if (Input.GetMouseButton(1)) {
             StartCoroutine(gun.AimDownSight());
@@ -40,11 +34,11 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
         }
 
         // Player Controls
-        player.moveHorizontal = Input.GetAxisRaw("Horizontal");
-        player.moveVertical = Input.GetAxisRaw("Vertical");
+        movement.moveHorizontal = Input.GetAxisRaw("Horizontal");
+        movement.moveVertical = Input.GetAxisRaw("Vertical");
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            StartCoroutine(player.Dash());
+            StartCoroutine(movement.Dash());
         }
     }
 }

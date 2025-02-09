@@ -1,9 +1,10 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Player : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {   
     [Header("Movement")]
     public float dashSpeed = 20.0f;
@@ -11,31 +12,22 @@ public class Player : MonoBehaviour
     public float maxSpeed = 10.0f;
     public int maxDashNum = 2;
 
-    public float currentDashCount = 0;
+    [NonSerialized] public float currentDashCount = 0;
+    [NonSerialized] public float moveHorizontal;
+    [NonSerialized] public float moveVertical;
     private float currentSpeed;
-    private Rigidbody rb;
-    public float moveHorizontal;
-    public float moveVertical;
-    Vector3 moveDirection;
-    Vector3 dashDirection;
+    private Vector3 moveDirection;
+    private Vector3 dashDirection;
 
-    [Header("Equipment")]
-    public GameObject weaponPrefab;
-    [System.NonSerialized] public GameObject currentWeapon;
+    [Header("References")]
+
+    [NonSerialized] public GameObject currentWeapon;
+    private Rigidbody rb;
 
     void Start()
     {   
         currentDashCount = maxDashNum;
         rb = GetComponent<Rigidbody>();
-        holdWeapon();
-    }
-
-    void holdWeapon() {
-        currentWeapon = Instantiate(weaponPrefab, transform.position, transform.rotation, transform);
-        BaseGun gun = currentWeapon.GetComponent<BaseGun>();
-        if (gun != null) {
-            gun.player = transform;
-        }
     }
 
     void Update()
@@ -53,12 +45,12 @@ public class Player : MonoBehaviour
         {
             currentSpeed = 0;
         }
-        rb.AddForce(moveDirection * currentSpeed);
         if (currentDashCount < maxDashNum) {
             currentDashCount += Time.deltaTime / dashCooldownSeconds;
         } else {
             currentDashCount = maxDashNum;
         }
+        rb.AddForce(moveDirection * currentSpeed);
     }
 
     public IEnumerator Dash() {
