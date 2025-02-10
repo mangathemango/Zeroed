@@ -269,7 +269,7 @@ public abstract class BaseGun : MonoBehaviour
             Debug.Log("Melee not ready");
             return;
         }
-        Vector3 targetDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection().point - playerPosition.transform.position;
+        Vector3 targetDirection = playerMovement.GetPlayerDirection().point - playerPosition.position;
         bool meleeHit = false;
         RaycastHit hit;
         if (Physics.Raycast(playerPosition.transform.position, targetDirection, out hit, meleeRange)) {
@@ -371,7 +371,7 @@ public abstract class BaseGun : MonoBehaviour
         }
 
         Vector3 expectedHitPoint = new Vector3();;
-        RaycastHit PlayerDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection();
+        RaycastHit PlayerDirection = playerMovement.GetPlayerDirection();
         Vector3 targetPoint = PlayerDirection.point;
         float targetDistance = PlayerDirection.distance;
         // Cast the first ray from the camera to the mouse position to get target point
