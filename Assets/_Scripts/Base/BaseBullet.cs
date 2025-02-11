@@ -4,14 +4,8 @@ using UnityEngine;
 public class BaseBullet: MonoBehaviour {
     public bool hit = false;
     public GameObject hitObject;
-    public GameObject source;
+    public float damage = 0f;
     public void SetupBullet() {
-        if (!source) {
-            Debug.LogError("Source not found for bullet");
-        }
-        if (!source.GetComponent<BaseGun>()) {
-            Debug.LogError("Source does not have BaseGun component");
-        }
         if (!GetComponent<Rigidbody>()) {
             gameObject.AddComponent<Rigidbody>();
         }
