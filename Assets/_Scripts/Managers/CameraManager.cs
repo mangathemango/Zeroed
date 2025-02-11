@@ -7,6 +7,16 @@ public class CameraManager : Singleton<CameraManager> {
     public float smoothTime = 0.3f;
     public Vector3 basePlayerOffset;
 
+    public Vector3 playerPositionOnScreen {get {
+        return Camera.main.WorldToScreenPoint(playerPosition.position);
+    }}
+    public Vector3 screenCenter {get {
+        return new Vector3 (
+            Screen.width / 2,
+            Screen.height / 2,
+            0
+        );
+    }}
     [NonSerialized] public Vector3 playerOffset = Vector3.zero;
     [NonSerialized] private PlayerMovement playerMovement;
     [NonSerialized] private Transform playerPosition;
@@ -28,6 +38,7 @@ public class CameraManager : Singleton<CameraManager> {
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref playerFollowVelocity, smoothTime);
     
         Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position,cameraFollow.position + offset, ref cameraVelocity, smoothTime);
+        Debug.Log(cameraVelocity);
         Camera.main.transform.LookAt(cameraFollow);
     }
 

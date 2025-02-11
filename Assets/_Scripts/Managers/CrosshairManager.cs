@@ -16,6 +16,7 @@ public class Crosshair : Singleton<Crosshair>
     private Vector3 velocity = Vector3.zero;
     private float smoothTime;
     private bool rotateCameraReady = true;
+    private Transform player;
     [Range(1f, 10f)]
     [SerializeField] private float stablizeRate = 2f;
     void Start()
@@ -27,8 +28,10 @@ public class Crosshair : Singleton<Crosshair>
         shotPlacement.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         shotOrigin.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         smoothTime = minSmoothTime;
+        player = GameObject.Find("Player").transform;
     }
-
+    
+    float minY;
     void Update()
     {
         // Get mouse movement delta
@@ -36,47 +39,53 @@ public class Crosshair : Singleton<Crosshair>
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
         shotPlacement.position += new Vector3(mouseX, mouseY, 0);
+        ClampCrosshairOnViewDiagonals();
+        
+        if (shotPlacement.position.normalized == new Vector3(shotPlacement.position.x,minY,0).normalized && rotateCameraReady) {
+            StartCoroutine(RotateCamera());
+        }
+
         shotOrigin.position = shotPlacement.position;
 
-        float minY;
+    }
+
+    private void ClampCrosshairOnViewDiagonals() {
         if (shotPlacement.position.x > Screen.width / 2) {
             minY = shotOrigin.position.x * Screen.height / Screen.width;
         } else {
             minY = Screen.height - shotOrigin.position.x * Screen.height / Screen.width;
         }
+        minY = minY - CameraManager.Instance.screenCenter.y + CameraManager.Instance.playerPositionOnScreen.y;
         shotPlacement.position = new Vector3(
             Mathf.Clamp(shotPlacement.position.x, 0  , Screen.width),
-            Mathf.Clamp(shotPlacement.position.y,Mathf.Clamp(minY, Screen.height / 2 + 20, Screen.height), Screen.height),
+            Mathf.Clamp(shotPlacement.position.y,Mathf.Clamp(minY, CameraManager.Instance.playerPositionOnScreen.y + 20, Screen.height), Screen.height),
             0
         );
-        
-        shotOrigin.position = new Vector3(
-            Mathf.Clamp(shotOrigin.position.x, 0  , Screen.width),
-            Mathf.Clamp(shotOrigin.position.y,Mathf.Clamp(minY, Screen.height / 2 + 20, Screen.height), Screen.height),
-            0
-        );
-        if (shotPlacement.position.normalized == new Vector3(shotPlacement.position.x,minY,0).normalized && rotateCameraReady) {
-            StartCoroutine(RotateCamera());
-        }
-
     }
-
     private IEnumerator RotateCamera() {
         if (!rotateCameraReady) {
             yield break;
         }
         rotateCameraReady = false;
+        Vector3 crosshairWorldpoint = ShotPlacementToRaycastHit().point;
+        Vector3 lastCrosshairScreenPoint = shotPlacement.position;
+        Vector3 lastPlayerPosition = player.position;
         if (shotPlacement.position.x > Screen.width / 2) {
             CameraManager.Instance.RotateClockwise(45);
         } else {
             CameraManager.Instance.RotateCounterclockwise(45);
         }
-        Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        Vector3 targetDirection = Vector3.up;
-        float targetMagnitude = (shotPlacement.position - screenCenter).magnitude;
-        Vector3 targetPosition = screenCenter + targetDirection * targetMagnitude;
-        shotPlacement.position = targetPosition;
-        yield return new WaitForSeconds(0.1f);
+        float timeElapsed = 0;
+        while (timeElapsed < 0.3f) {
+            timeElapsed += Time.deltaTime;
+            Vector3 currentPlayerPosition = player.position;
+            crosshairWorldpoint += currentPlayerPosition - lastPlayerPosition;
+            lastPlayerPosition = currentPlayerPosition;
+            Vector3 currentCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
+            shotPlacement.position += currentCrosshairScreenPoint - lastCrosshairScreenPoint;
+            lastCrosshairScreenPoint = currentCrosshairScreenPoint;
+            yield return null;
+        }
         rotateCameraReady = true;
     }
     public Vector3 GetPlacementDistanceFromCenter()
