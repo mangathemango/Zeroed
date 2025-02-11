@@ -414,7 +414,7 @@ public abstract class BaseGun : MonoBehaviour
         // Instantiate the bullet
         GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
         bullet.GetComponent<Rigidbody>().linearVelocity = shootingDirection * muzzleVelocity;
-        bullet.GetComponent<BaseBullet>().source = gameObject;
+        bullet.GetComponent<BaseBullet>().damage = maxDamage;
 
                 // Play the fire sound
 

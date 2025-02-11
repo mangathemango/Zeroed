@@ -30,7 +30,6 @@ public class SpitBall : BaseBullet
                 float damage = 10f;
                 hitObject.GetComponent<BaseEnemy>().TakeDamage(damage);
             }
-            Debug.Log("Hit object: " + hitObject.name);
             Invoke("Destroy", despawnOnCollisionTime);  
             firstHit = false;
         }

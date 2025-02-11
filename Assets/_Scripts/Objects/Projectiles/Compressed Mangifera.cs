@@ -24,7 +24,6 @@ class CompressedMangifera: BaseBullet {
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
             foreach (var hitCollider in hitColliders) {
                 if (hitCollider.GetComponent<BaseEnemy>() != null) {
-                    float damage = source.GetComponent<BaseGun>().maxDamage;
                     hitCollider.GetComponent<BaseEnemy>().TakeDamage(damage , -explosionForce * (transform.position - hitCollider.transform.position).normalized);
                     hitCollider.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRadius);
                 }
