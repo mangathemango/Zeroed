@@ -131,7 +131,6 @@ public abstract class BaseGun : MonoBehaviour
     public PlayerMovement playerMovement;
     public Transform playerPosition;
     public AudioSource audioSource;
-    public RotateAround rotateAround;
     public FireMode currentFireMode;
     public bool meleeReady = true;
     public bool autoFireReady = true;
@@ -167,33 +166,45 @@ public abstract class BaseGun : MonoBehaviour
 
     protected virtual void Start()
     {
+        // Setup References
         GameObject player = GameObject.Find("Player");
         playerPosition = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
+
+        if (audioSource == null) {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        // Setup gun stuff
         currentFireMode = defaultFireMode;
         currentAmmoInMag = ammoCapacity - 1;
         currentAmmoInChamber = 1;
         setupFireModes();
-        rotateAround = gameObject.AddComponent<RotateAround>();
-        rotateAround.target = playerPosition;
-        rotateAround.offsetPosition = new Vector3(0, 0, -1);
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null) {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
     }
 
 
     // Update is called once per frame
     protected virtual void Update()
     {   
-        transform.rotation = playerPosition.rotation;
+        LookAtCursor();
+        RotateAroundPlayer();
         if (triggerPressed) {
             HandleTriggerPressed();
         }
         if (aiming && !aimCoroutineRunning) {
             StartCoroutine(Aim());
         }
+    }
+
+    void LookAtCursor() {
+        Vector3 targetPosition = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        targetPosition.y = transform.position.y;
+        transform.LookAt(targetPosition);
+    }
+
+    void RotateAroundPlayer () {
+        transform.RotateAround(playerPosition.position, Vector3.up, transform.rotation.y);
+        transform.position = playerPosition.position + (transform.rotation * Vector3.forward);
     }
 
     public IEnumerator Reload() {
@@ -269,7 +280,7 @@ public abstract class BaseGun : MonoBehaviour
             Debug.Log("Melee not ready");
             return;
         }
-        Vector3 targetDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection().point - playerPosition.transform.position;
+        Vector3 targetDirection = Crosshair.Instance.ShotOriginToRaycastHit().point - playerPosition.position;
         bool meleeHit = false;
         RaycastHit hit;
         if (Physics.Raycast(playerPosition.transform.position, targetDirection, out hit, meleeRange)) {
@@ -370,16 +381,17 @@ public abstract class BaseGun : MonoBehaviour
             }
         }
 
-        Vector3 expectedHitPoint = new Vector3();;
-        RaycastHit PlayerDirection = playerPosition.GetComponent<PlayerMovement>().GetPlayerDirection();
-        Vector3 targetPoint = PlayerDirection.point;
-        float targetDistance = PlayerDirection.distance;
-        // Cast the first ray from the camera to the mouse position to get target point
+        Vector3 expectedHitPoint = new Vector3();
+        
+        // Cast the first ray from shot placement to get target point
+        Vector3 targetPoint = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        float targetDistance = 100f;
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
         Ray ray = new Ray(firePoint.position, targetPoint - firePoint.position);
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             expectedHitPoint = hit.point;
+            targetDistance = hit.distance;
         }
 
         // Convert MOA to radians
@@ -399,7 +411,7 @@ public abstract class BaseGun : MonoBehaviour
         // Instantiate the bullet
         GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
         bullet.GetComponent<Rigidbody>().linearVelocity = shootingDirection * muzzleVelocity;
-        bullet.GetComponent<BaseBullet>().source = gameObject;
+        bullet.GetComponent<BaseBullet>().damage = maxDamage;
 
                 // Play the fire sound
 

@@ -3,7 +3,7 @@ using TMPro;
 using Unity.VectorGraphics;
 using UnityEngine.UI;
 
-public class UiUpdater: MonoBehaviour {
+public class UiUpdater: Singleton<UiUpdater> {
     private PlayerInventory playerInventory;
     private GameObject currentWeapon; 
     private TextMeshProUGUI ammoCountUI;
