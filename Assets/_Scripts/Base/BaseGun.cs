@@ -46,6 +46,7 @@ public abstract class BaseGun : MonoBehaviour
     public string gunName;
     public GameObject ammoType;
     public int ammoCapacity = 10;
+    public int chamberCapacity = 1;
     [Range (0.0f, 10.0f)]
     public float mass = 0.1f;
     [Range (10.0f, 1000.0f)]
@@ -207,8 +208,8 @@ public abstract class BaseGun : MonoBehaviour
         transform.position = playerPosition.position + (transform.rotation * Vector3.forward);
     }
 
-    public IEnumerator Reload() {
-        if (reloading) {
+    public virtual IEnumerator Reload() {
+        if (reloading || (currentAmmoInMag >= ammoCapacity && ammoCapacity > 0)) {
             yield break;
         }
         audioSource.PlayOneShot(reloadSFX, soundSignature / 3);
@@ -216,7 +217,11 @@ public abstract class BaseGun : MonoBehaviour
         currentAmmoInMag = 0;
         reloading = true;
         yield return new WaitForSeconds(reloadTimeSeconds);
-        currentAmmoInMag = ammoCapacity;
+        if (ammoCapacity > 0) {
+            currentAmmoInMag = ammoCapacity;
+        } else {
+            currentAmmoInChamber = chamberCapacity;
+        }
         reloading = false;
     }
 
