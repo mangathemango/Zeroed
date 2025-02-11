@@ -5,6 +5,7 @@ public class CameraManager : Singleton<CameraManager> {
     public Transform cameraFollow;
     public Vector3 offset;
     public float smoothTime = 0.3f;
+    public Vector3 basePlayerOffset;
 
     [NonSerialized] public Vector3 playerOffset = Vector3.zero;
     [NonSerialized] private PlayerMovement playerMovement;
@@ -22,7 +23,7 @@ public class CameraManager : Singleton<CameraManager> {
         cameraFollow.position = playerPosition.position;
     }
     void Update() {
-        Vector3 targetPosition = playerPosition.position + playerMovement.ConvertToPlayerDirection(playerOffset);
+        Vector3 targetPosition = playerPosition.position + playerMovement.ConvertToPlayerDirection(playerOffset + basePlayerOffset);
 
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref playerFollowVelocity, smoothTime);
     
