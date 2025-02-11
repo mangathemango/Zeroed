@@ -167,13 +167,11 @@ public abstract class BaseGun : MonoBehaviour
 
     protected virtual void Start()
     {
+        // Setup References
         GameObject player = GameObject.Find("Player");
         playerPosition = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
-        currentFireMode = defaultFireMode;
-        currentAmmoInMag = ammoCapacity - 1;
-        currentAmmoInChamber = 1;
-        setupFireModes();
+
         rotateAround = gameObject.AddComponent<RotateAround>();
         rotateAround.target = playerPosition;
         rotateAround.offsetPosition = new Vector3(0, 0, -1);
@@ -181,18 +179,34 @@ public abstract class BaseGun : MonoBehaviour
         if (audioSource == null) {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
+
+        // Setup gun stuff
+        currentFireMode = defaultFireMode;
+        currentAmmoInMag = ammoCapacity - 1;
+        currentAmmoInChamber = 1;
+        setupFireModes();
     }
 
 
     // Update is called once per frame
     protected virtual void Update()
     {   
-        transform.rotation = playerPosition.rotation;
+        LookAtCursor();
         if (triggerPressed) {
             HandleTriggerPressed();
         }
         if (aiming && !aimCoroutineRunning) {
             StartCoroutine(Aim());
+        }
+    }
+
+    void LookAtCursor() {
+        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.placement.position);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {   
+            Vector3 targetPosition = hit.point;
+            targetPosition.y = transform.position.y;
+            transform.LookAt(targetPosition);
         }
     }
 
@@ -269,7 +283,7 @@ public abstract class BaseGun : MonoBehaviour
             Debug.Log("Melee not ready");
             return;
         }
-        Vector3 targetDirection = playerMovement.GetPlayerDirection().point - playerPosition.position;
+        Vector3 targetDirection = Crosshair.Instance.ShotOriginToRaycastHit().point - playerPosition.position;
         bool meleeHit = false;
         RaycastHit hit;
         if (Physics.Raycast(playerPosition.transform.position, targetDirection, out hit, meleeRange)) {
@@ -370,16 +384,17 @@ public abstract class BaseGun : MonoBehaviour
             }
         }
 
-        Vector3 expectedHitPoint = new Vector3();;
-        RaycastHit PlayerDirection = playerMovement.GetPlayerDirection();
-        Vector3 targetPoint = PlayerDirection.point;
-        float targetDistance = PlayerDirection.distance;
-        // Cast the first ray from the camera to the mouse position to get target point
+        Vector3 expectedHitPoint = new Vector3();
+        
+        // Cast the first ray from shot placement to get target point
+        Vector3 targetPoint = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        float targetDistance = 100f;
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
         Ray ray = new Ray(firePoint.position, targetPoint - firePoint.position);
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             expectedHitPoint = hit.point;
+            targetDistance = hit.distance;
         }
 
         // Convert MOA to radians

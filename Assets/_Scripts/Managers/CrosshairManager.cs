@@ -80,6 +80,31 @@ public class Crosshair : Singleton<Crosshair>
             0
         );
     }
+
+    public Ray ShotOriginToRay()
+    {
+        return Camera.main.ScreenPointToRay(shotOrigin.position);
+    }
+
+    public Ray ShotPlacementToRay()
+    {
+        return Camera.main.ScreenPointToRay(shotPlacement.position);
+    }
+
+    public RaycastHit ShotOriginToRaycastHit()
+    {
+        RaycastHit hit;
+        Physics.Raycast(ShotOriginToRay(), out hit);
+        return hit;
+    }
+
+    public RaycastHit ShotPlacementToRaycastHit()
+    {
+        RaycastHit hit;
+        Physics.Raycast(ShotPlacementToRay(), out hit);
+        return hit;
+    }
+
     public void Recoil(float recoilX, float recoilY)
     {
         Vector3 previousPosition = shotPlacement.position;

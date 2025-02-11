@@ -74,21 +74,6 @@ public class PlayerMovement : MonoBehaviour
         yield break;
     }
 
-    
-    public RaycastHit GetPlayerDirection()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.placement.position);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            return hit;
-        }
-        else
-        {
-            return new RaycastHit();
-        }
-    }
-
     public Vector3 ConvertToPlayerDirection(Vector3 direction)
     {
         return Quaternion.LookRotation(forwardDirection) * direction;
