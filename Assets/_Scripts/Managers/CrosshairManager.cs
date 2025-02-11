@@ -80,29 +80,6 @@ public class Crosshair : Singleton<Crosshair>
             0
         );
     }
-    public Vector3 GetMaxDistanceFromCenter(Vector3 direction) {
-        Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        Vector3 maxDistance = Vector3.zero;
-
-        if (direction.x != 0)
-        {
-            float t = (direction.x > 0) ? (Screen.width - screenCenter.x) / direction.x : -screenCenter.x / direction.x;
-            maxDistance = screenCenter + direction * t;
-        }
-
-        if (direction.y != 0)
-        {
-            float t = (direction.y > 0) ? (Screen.height - screenCenter.y) / direction.y : -screenCenter.y / direction.y;
-            Vector3 candidate = screenCenter + direction * t;
-            if (maxDistance == Vector3.zero || candidate.magnitude < maxDistance.magnitude)
-            {
-            maxDistance = candidate;
-            }
-        }
-        maxDistance.x /= Screen.width;
-        maxDistance.y /= Screen.height;
-        return maxDistance;
-    }
     public void Recoil(float recoilX, float recoilY)
     {
         Vector3 previousPosition = shotPlacement.position;
