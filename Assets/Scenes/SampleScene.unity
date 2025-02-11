@@ -1294,6 +1294,7 @@ MonoBehaviour:
   cameraFollow: {fileID: 29198788}
   offset: {x: 100, y: 100, z: -100}
   smoothTime: 0.1
+  basePlayerOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &981555635
 GameObject:
   m_ObjectHideFlags: 0
