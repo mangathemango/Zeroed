@@ -131,7 +131,6 @@ public abstract class BaseGun : MonoBehaviour
     public PlayerMovement playerMovement;
     public Transform playerPosition;
     public AudioSource audioSource;
-    public RotateAround rotateAround;
     public FireMode currentFireMode;
     public bool meleeReady = true;
     public bool autoFireReady = true;
@@ -172,10 +171,6 @@ public abstract class BaseGun : MonoBehaviour
         playerPosition = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
 
-        rotateAround = gameObject.AddComponent<RotateAround>();
-        rotateAround.target = playerPosition;
-        rotateAround.offsetPosition = new Vector3(0, 0, -1);
-        audioSource = GetComponent<AudioSource>();
         if (audioSource == null) {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
@@ -192,6 +187,7 @@ public abstract class BaseGun : MonoBehaviour
     protected virtual void Update()
     {   
         LookAtCursor();
+        RotateAroundPlayer();
         if (triggerPressed) {
             HandleTriggerPressed();
         }
@@ -201,13 +197,14 @@ public abstract class BaseGun : MonoBehaviour
     }
 
     void LookAtCursor() {
-        Ray ray = Camera.main.ScreenPointToRay(Crosshair.Instance.placement.position);
-        if (Physics.Raycast(ray, out RaycastHit hit))
-        {   
-            Vector3 targetPosition = hit.point;
-            targetPosition.y = transform.position.y;
-            transform.LookAt(targetPosition);
-        }
+        Vector3 targetPosition = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        targetPosition.y = transform.position.y;
+        transform.LookAt(targetPosition);
+    }
+
+    void RotateAroundPlayer () {
+        transform.RotateAround(playerPosition.position, Vector3.up, transform.rotation.y);
+        transform.position = playerPosition.position + (transform.rotation * Vector3.forward);
     }
 
     public IEnumerator Reload() {
