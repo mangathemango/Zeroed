@@ -6,6 +6,12 @@ public class Crosshair : Singleton<Crosshair>
 {   
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
+    [SerializeField] private float shootableZone = 0f;
+    public bool placementIsInShootableZone {
+        get {
+            return (Screen.height - shotPlacement.position.y) >= shootableZone;
+        }
+    }
     private Transform shotPlacement;
     private Transform shotOrigin;
 
@@ -22,13 +28,13 @@ public class Crosshair : Singleton<Crosshair>
         shotOrigin = GameObject.Find("Shot Origin UI").transform;
         shotPlacement.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         shotOrigin.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        smoothTime = minSmoothTime;
         player = GameObject.Find("Player").transform;
     }
     
     float minY;
     void Update()
-    {
+    {   
+        Debug.Log(placementIsInShootableZone);
         // Get mouse movement delta
         float mouseX = Input.GetAxis("Mouse X") * sensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;

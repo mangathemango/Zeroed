@@ -378,6 +378,9 @@ public abstract class BaseGun : MonoBehaviour
     }
 
     protected virtual void Fire() {
+        if (!Crosshair.Instance.placementIsInShootableZone) {
+            return;
+        }
         currentAmmoInChamber -= 1;
         if (currentAmmoInMag >= 1 && !reloading) {
             if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
