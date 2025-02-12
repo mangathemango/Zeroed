@@ -4,17 +4,12 @@ using UnityEngine;
 
 public class Crosshair : Singleton<Crosshair>
 {   
-    [Range(0f, 0.5f)]
-    [SerializeField] private float minSmoothTime = 0f;
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
     private Transform shotPlacement;
     private Transform shotOrigin;
 
-    public Transform placement {get {return shotPlacement;}}
     public bool shooting = false;
-    private Vector3 velocity = Vector3.zero;
-    private float smoothTime;
     private bool rotateCameraReady = true;
     private Transform player;
     [Range(1f, 10f)]
