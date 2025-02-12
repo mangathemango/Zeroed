@@ -38,7 +38,7 @@ public class CameraManager : Singleton<CameraManager> {
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref playerFollowVelocity, smoothTime);
     
         Camera.main.transform.position = Vector3.SmoothDamp(Camera.main.transform.position,cameraFollow.position + offset, ref cameraVelocity, smoothTime);
-        Debug.Log(cameraVelocity);
+        
         Camera.main.transform.LookAt(cameraFollow);
     }
 
