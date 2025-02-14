@@ -1,7 +1,5 @@
 # ZEROED v0.1
 
-***(This readme file is still in progress)***
-
 Zeroed is a 2.5D roguelike shooter game made in Unity6 (6000.0.37f1). The 0.1 version focuses on the game's core mechanics, such as gun mechanics, world generation, and so on. Right now, it will be 100% public, but if this project gets big enough (and the contributers learn how to use git), I will set this to private
 
 ![1739421576998](image/README/1739421576998.png)
@@ -10,6 +8,16 @@ Zeroed is a 2.5D roguelike shooter game made in Unity6 (6000.0.37f1). The 0.1 ve
 
 Here's a complete guide on how this github thing works
 
+## Table of Contents
+
+- [If you're a contributor](#if-youre-a-contributor)
+  - [If you're new to github](#if-youre-new-to-github)
+    - [What is github](#what-is-github)
+    - [Branches](#branches)
+    - [Issues](#issues)
+    - [Pull requests](#pull-requests)
+  - [How to play test the game without git (or even without a github account) (Quick setup)](#how-to-play-test-the-game-without-git-or-even-without-a-github-account-quick-setup)
+  - [How to play test the game using git (Recommended)](#how-to-play-test-the-game-using-git-recommended)
 
 ### If you're new to github
 
@@ -17,9 +25,9 @@ Here's a complete guide on how this github thing works
 
 TLDR, using github is like using protection. I can wreck up my code real bad and then just revert to a previous version of my codebase. Not only that, it also allows for multiple people to work on the same project at the same time. Very nice for collaboration.
 
-Another thing that's worth mentioning - even personal projects can and should be pushed on to github. This is not only so that your code has a fallback plan in case it breaks, but your github repository can also be put in your CV as experience as well. All in all, ***Every programmer should have a github account*** 
+Another thing that's worth mentioning - even personal projects can and should be pushed on to github. This is not only so that your code has a fallback plan in case it breaks, but your github repository can also be put in your CV as experience as well. All in all, ***Every programmer should have a github account***
 
-Also, contrary to popular non-programmers beliefs, ***Github is used not always used for code.*** Many a time, a github repository is a means to communicate between users and developers (esp in the [Issues tab](#issues)). 
+Also, contrary to popular non-programmers beliefs, ***Github is used not always used for code.*** Many a time, a github repository is a means to communicate between users and developers (esp in the [Issues tab](#issues)).
 
 #### Branches
 
@@ -50,7 +58,7 @@ This is essentially useful if you want to add files and allat into the repositor
 This is a quick setup for downloading the game to your device.
 
 - Step 1: Download Unity Hub, and Unity Engine version 6000.0.37f1
-- Step 2: Navigate to the branch you want to play test. For example, check out "bugfix/prevent-no-recoil-on-screen-border" to see the lastest bug fix on this problem. 
+- Step 2: Navigate to the branch you want to play test. For example, check out "bugfix/prevent-no-recoil-on-screen-border" to see the lastest bug fix on this problem.
 
 ![1739432054024](image/README/1739432054024.png)
 
@@ -59,13 +67,13 @@ This is a quick setup for downloading the game to your device.
 ![1739432013009](image/README/1739432013009.png)
 
 - Step 4: Extract the files
-
 - Step 5: Open Unity Hub, click "Add project from disk", and select the folder you just extracted
 
 ![1739432161303](image/README/1739432161303.png)
 
 - Step 6: Click on the project, and you're done!
 
-The bad thing about this approach is that whenever there's a new feature 
+The bad thing about this approach is that whenever there's a new feature
 
 ### How to play test the game using git (Recommended)
+- Step 1: Download Git
