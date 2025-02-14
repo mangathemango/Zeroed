@@ -38,110 +38,167 @@ public enum OpticType {
     x4
 }
 
-// oh yeahs sure
+/// <summary>
+///* Base class for all guns in the game
+/// </summary>
 public abstract class BaseGun : MonoBehaviour
 
 {
     [Header("General")]
+    [Tooltip("The name of the gun")]
     public string gunName;
+    [Tooltip("The type of ammunition used by the gun")]
     public GameObject ammoType;
+    [Tooltip("The maximum number of rounds the gun can hold in its magazine")]
     public int ammoCapacity = 10;
+    [Tooltip("The number of rounds the gun can hold in its chamber")]
     public int chamberCapacity = 1;
-    [Range (0.0f, 10.0f)]
+    [Tooltip("The mass of the gun in kilograms")]
+    [Range       (0.0f, 10.0f)]
     public float mass = 0.1f;
+    [Tooltip("The muzzle velocity of the gun in meters per second")]
     [Range (10.0f, 1000.0f)]
     public float muzzleVelocity = 300.0f;
+    [Tooltip("The sound signature of the gun")]
     [Range (1.0f, 10.0f)]
     public float soundSignature = 1.0f;
+    [Tooltip("The time it takes to pull the trigger in seconds")]
     [Range (0f, 1f)]
     public float triggerPullTimeSeconds = 0.2f;
+    [Tooltip("Apparently, this is technically melee cooldown for now")]
     [Range (0f, 3f)]
     public float switchTimeSeconds = 1.0f;
+    [Tooltip("The time it takes to aim down sights in seconds")]
     [Range (0f, 2f)]
     public float adsTimeSeconds = 0.3f;
+    [Tooltip("The time it takes to reload the gun in seconds")]
     [Range (0f, 4f)]
     public float reloadTimeSeconds = 1.0f;
+    [Tooltip("The time it takes to charge the gun in seconds")]
     [Range (0f, 3f)]
     public float chargingTime = 0.5f;
+    [Tooltip("The default fire mode of the gun")]
     public FireMode defaultFireMode = FireMode.Semi;
     
-
-
     [Header("Damage")]
+    [Tooltip("The maximum damage the gun can deal")]
     [Range (0f, 100f)]
     public float maxDamage = 10.0f;
+    [Tooltip("The minimum damage the gun can deal")]
     [Range (0f, 100f)]
     public float minDamage = 1.0f;
+    [Tooltip("The range at which the gun deals maximum damage")]
     [Range (0f, 100f)]
     public float maxDamageRange = 10.0f;
+    [Tooltip("The range at which the gun deals minimum damage")]
     [Range (0f, 100f)]
     public float minDamageRange = 100.0f;
+    [Tooltip("The percentage of armor penetration")]
     [Range (0f, 1f)]
     public float armorPenetrationPercent = 0f;
+    [Tooltip("The multiplier for armor damage")]
     [Range (1f, 10f)]
     public float armorDamageMultiplier = 0.1f;
+    [Tooltip("The multiplier for headshot damage")]
     [Range (1f, 10f)]
     public float headshotMultiplier = 2.0f;
 
     [Header("Semi")]
+    [Tooltip("Indicates if the gun has semi-automatic fire mode")]
     public bool hasSemiFire = false;
+    [Tooltip("Indicates if the gun requires charging between shots in semi-automatic mode")]
     public bool requiresChargingBetweenShots = false;
     
-
     [Header("Auto")]
+    [Tooltip("Indicates if the gun has automatic fire mode")]
     public bool hasAutoFire = false;
+    [Tooltip("The rate of fire in shots per minute")]
     [Range (100.0f, 1000.0f)]
     public float shotsPerMinute = 600.0f;
 
-    
     [Header("Burst")]
+    [Tooltip("Indicates if the gun has burst fire mode")]
     public bool hasBurstFire = false;
+    [Tooltip("The number of shots fired in a burst")]
     public int burstSize = 0;
+    [Tooltip("The rate of fire for burst mode in shots per minute")]
     public float burstRate = 600.0f;
 
     [Header("Spread")]
+    [Tooltip("The spread of the gun when firing from the hip in MOA")]
     public float pointFireSpreadMOA = 1.0f;
+    [Tooltip("The spread of the gun when aiming down sights in MOA")]
     public float adsSpreadMOA = 0.1f;
+    [Tooltip("The spread of the pellets in MOA for shotguns")]
     public float pelletSpreadMOA = 2.0f;
 
     [Header("Recoil")]
+    [Tooltip("The vertical recoil of the gun")]
     [Range (0.0f, 10.0f)]
     public float recoilY = 1.0f;
+    [Tooltip("The horizontal recoil of the gun")]
     [Range (0.0f, 10.0f)]
     public float recoilX = 1.0f;
 
     [Header("Attachments")]
+    [Tooltip("The type of optic attached to the gun")]
     public OpticType Optics = OpticType.None;
 
     [Header("Melee")]
+    [Tooltip("The damage dealt by melee attacks")]
     public float meleeDamage = 10.0f;
+    [Tooltip("The range of melee attacks")]
     public float meleeRange = 2f;
+    [Tooltip("The knockback force of melee attacks")]
     public float meleeKnockback = 1.0f;
+    [Tooltip("The stagger time caused by melee attacks in seconds")]
     public float meleeStaggerTimeSeconds = 0.5f;
 
     [Header("References")]
+    [Tooltip("The point from which the gun fires")]
     public Transform firePoint;
+    [Tooltip("The sound effect played when the trigger is pulled but the gun is empty")]
     public AudioClip deadTriggerSFX;
+    [Tooltip("The sound effect played when the disconnector is engaged")]
     public AudioClip disconnectorSFX;
+    [Tooltip("The sound effect played when the gun is fired")]
     public AudioClip fireSFX;
+    [Tooltip("The sound effect played when the gun is reloaded")]
     public AudioClip reloadSFX;
+    [Tooltip("The sound effect played when the gun is charged")]
     public AudioClip chargeSFX;
+    [Tooltip("The sound effect played when a melee attack misses")]
     public AudioClip meleeMissSFX;
+    [Tooltip("The sound effect played when a melee attack hits")]
     public AudioClip meleeHitSFX;
 #if DEBUG
+    [Tooltip("The player movement script")]
     public PlayerMovement playerMovement;
+    [Tooltip("The position of the player")]
     public Transform playerPosition;
+    [Tooltip("The audio source for playing sound effects")]
     public AudioSource audioSource;
+    [Tooltip("The current fire mode of the gun")]
     public FireMode currentFireMode;
+    [Tooltip("Indicates if the melee attack is ready")]
     public bool meleeReady = true;
+    [Tooltip("Indicates if the gun is ready to fire in automatic mode")]
     public bool autoFireReady = true;
+    [Tooltip("Indicates if the gun is ready to fire in semi-automatic mode")]
     public bool semiFireReady = true;
+    [Tooltip("Indicates if the gun is ready to fire in burst mode")]
     public bool burstFireReady = true;
+    [Tooltip("The current number of rounds in the magazine")]
     public int currentAmmoInMag;
+    [Tooltip("The current number of rounds in the chamber")]
     public int currentAmmoInChamber;
+    [Tooltip("Indicates if the trigger is pressed")]
     public bool triggerPressed = false;
+    [Tooltip("Indicates if the gun is being charged")]
     public bool charging = false;
+    [Tooltip("Indicates if the gun is being reloaded")]
     public bool reloading = false;
+    [Tooltip("Indicates if the player is aiming down sights")]
     public bool aiming = false;
 #else
     [System.NonSerialized] public Transform player;
@@ -161,8 +218,11 @@ public abstract class BaseGun : MonoBehaviour
 #endif
 
     [Header("Internal")]
+    [Tooltip("Indicates if the aim coroutine is running")]
     private bool aimCoroutineRunning = false;
+    [Tooltip("Indicates if the press trigger coroutine is running")]
     private bool pressTriggerCoroutineRunning = false;
+    [Tooltip("The number of shots fired in the current burst")]
     private int burstShotsFired = 0;
 
     protected virtual void Start()
