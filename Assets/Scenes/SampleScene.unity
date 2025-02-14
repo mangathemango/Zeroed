@@ -2803,7 +2803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 400736f18a102904d9774856029153bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSmoothTime: 0
+  minSmoothTime: 0.1
   sensitivity: 10
   shooting: 0
   stablizeRate: 2.3
