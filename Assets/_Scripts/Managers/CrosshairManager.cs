@@ -2,6 +2,19 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+///* Manages the crosshair/cursor<br/><br/>
+///
+///! The crosshair currently has two components: the shot placement (square) and the shot origin (dot) <br/>
+///! This is only implemented because of a previous recoil system. This will be merged into one later <br/><br/>
+///
+///? As per current version, the crosshair's mobility is limitted by 2 invisible diagonal lines,<br/>
+///? from the player's position to both top corners to the screen. In this code, they're called "view diagonals"<br/>
+///? When the crosshair moves to either side of the view diagonals, the camera will rotate 45 degress on that way<br/><br/>
+///
+/// TODO #1: Remove shot placement/ shot origin separation
+
+/// </summary>
 public class Crosshair : Singleton<Crosshair>
 {   
     [Range(0f, 0.5f)]
@@ -18,9 +31,10 @@ public class Crosshair : Singleton<Crosshair>
     private bool rotateCameraReady = true;
     private Transform player;
     [Range(1f, 10f)]
-    [SerializeField] private float stablizeRate = 2f;
+    [SerializeField] private float stablizeRate = 2f; //! This does nothing
     void Start()
     {
+        // Locks the cursor in the center of the screen
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         shotPlacement = GameObject.Find("Shot Placement UI").transform;
