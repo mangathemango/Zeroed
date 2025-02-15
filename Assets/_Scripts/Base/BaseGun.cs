@@ -559,11 +559,11 @@ public abstract class BaseGun : MonoBehaviour
         float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
 
         
-        Vector3 shootingDirection = (expectedHitPoint - firePoint.position).normalized;
+        Vector3 shootingDirection = expectedHitPoint - firePoint.position;
         // Apply random spread
         shootingDirection.x += Random.Range(-spreadAtDistance, spreadAtDistance);
         shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
-        return shootingDirection;
+        return shootingDirection.normalized;
     }
 
     private FireMode[] fireModeList;
