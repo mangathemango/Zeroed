@@ -475,14 +475,12 @@ public abstract class BaseGun : MonoBehaviour
         Vector3 pointOnRay1 = origin1 + t * direction1;
         Vector3 pointOnRay2 = origin2 + s * direction2;
 
-        Debug.Log("Point on Ray 1: " + pointOnRay1);
-        Debug.Log("Point on Ray 2: " + pointOnRay2);
 
 
         // Check if the points are the same (within a small tolerance)
 
         
-            intersectionPoint = pointOnRay2;
+            intersectionPoint = pointOnRay1;
             return true;
         
     }
