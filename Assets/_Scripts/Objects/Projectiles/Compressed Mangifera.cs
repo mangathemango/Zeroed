@@ -28,7 +28,6 @@ class CompressedMangifera: BaseBullet {
                     hitCollider.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRadius);
                 }
             }
-            Debug.Log("Hit object: " + hitObject.name);
             Invoke("Destroy", despawnOnCollisionTime);  
             firstHit = false;
         }

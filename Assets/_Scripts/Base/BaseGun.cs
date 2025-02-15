@@ -398,6 +398,14 @@ public abstract class BaseGun : MonoBehaviour
             expectedHitPoint = hit.point;
             targetDistance = hit.distance;
         }
+        if (expectedHitPoint != targetPoint) {
+            Ray tempVerticalRay = new Ray(expectedHitPoint, Vector3.up);
+            if (!AreRaysIntersecting(Crosshair.Instance.ShotPlacementToRay(), tempVerticalRay, out Vector3 intersectionPoint)) {
+                Debug.LogError("Rays are not intersecting!");
+            } else {
+                expectedHitPoint = intersectionPoint;
+            };
+        }
 
         // Convert MOA to radians
         float spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
@@ -425,6 +433,58 @@ public abstract class BaseGun : MonoBehaviour
         }
         // Move the crosshair to random direction
         Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
+    }
+
+    /// <summary>
+    ///* This is taken from AI
+    /// </summary>
+    /// <param name="ray1">The first ray</param>
+    /// <param name="ray2">The second ray</param>
+    /// <param name="intersectionPoint">The intersection point</param>
+    /// <returns>Whether the two rays intersect</returns>
+    public static bool AreRaysIntersecting(Ray ray1, Ray ray2, out Vector3 intersectionPoint)
+    {
+        intersectionPoint = Vector3.zero;
+
+        Vector3 origin1 = ray1.origin;
+        Vector3 direction1 = ray1.direction;
+        Vector3 origin2 = ray2.origin;
+        Vector3 direction2 = ray2.direction;
+
+        // Calculate the cross product of the direction vectors
+        Vector3 crossD1D2 = Vector3.Cross(direction1, direction2);
+
+        // If the cross product is zero, the rays are parallel and do not intersect
+        if (crossD1D2 == Vector3.zero)
+        {
+            return false;
+        }
+
+        // Calculate the vector between the origins
+        Vector3 originDiff = origin2 - origin1;
+
+        // Calculate the determinants
+        float det1 = Vector3.Dot(Vector3.Cross(originDiff, direction2), crossD1D2);
+        float det2 = Vector3.Dot(Vector3.Cross(originDiff, direction1), crossD1D2);
+
+        // Calculate the parameters t and s
+        float t = det1 / crossD1D2.sqrMagnitude;
+        float s = det2 / crossD1D2.sqrMagnitude;
+
+        // Calculate the intersection points on both rays
+        Vector3 pointOnRay1 = origin1 + t * direction1;
+        Vector3 pointOnRay2 = origin2 + s * direction2;
+
+        Debug.Log("Point on Ray 1: " + pointOnRay1);
+        Debug.Log("Point on Ray 2: " + pointOnRay2);
+
+
+        // Check if the points are the same (within a small tolerance)
+
+        
+            intersectionPoint = pointOnRay2;
+            return true;
+        
     }
 
     private FireMode[] fireModeList;
