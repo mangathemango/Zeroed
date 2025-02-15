@@ -491,19 +491,50 @@ public abstract class BaseGun : MonoBehaviour
     /// 
     /// ? This function handles every action required to fire a gun: Reduce ammo, calculate spread, instantiate bullet, <br/>
     /// ? calculate damage, recoil etc.<br/>
-    /// TODO: Split each action into separate functions for better readability. <br/>
     /// TODO: Implement damage calculation based on range. <br/>
     /// </summary>
     protected virtual void Fire() {
         currentAmmoInChamber -= 1;
-        if (currentAmmoInMag >= 1 && !reloading) {
-            if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
-                currentAmmoInMag -= 1;
-                currentAmmoInChamber += 1;
-            }
+        if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
+            // Automatically charge the gun if gun doesn't require charging between shots
+            AutoCharge();
         }
+        
+        // Instantiate the bullet
+        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
+        bullet.GetComponent<Rigidbody>().linearVelocity = GetShootingDirection() * muzzleVelocity;
+        bullet.GetComponent<BaseBullet>().damage = maxDamage;
 
-        Vector3 expectedHitPoint = new Vector3();
+        // Play the fire sound
+        if (fireSFX != null) {
+            audioSource.PlayOneShot(fireSFX, soundSignature);
+        }
+        // Move the crosshair to random direction
+        Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
+    }
+
+    /// <summary>
+    /// * Automatically charges the gun<br/><br/>
+    /// 
+    /// ? Different from Charge(), this function is called after the player shoots the gun, not when the player presses any button<br/>
+    /// </summary>
+    protected void AutoCharge() {
+        if (reloading || charging) {
+            return;
+        }
+        if (currentAmmoInMag <= 0) {
+            return;
+        }
+        currentAmmoInMag -= 1;
+        currentAmmoInChamber += 1;
+    }
+
+    /// <summary>
+    /// * Gets the shooting direction based on the shot placement position and spread of the gun<br/><br/>
+    /// ? To view how this is done, check the comments inside this function<br/>
+    /// </summary>
+    /// <returns>The bullet's expected firing direction</returns>
+    protected Vector3 GetShootingDirection() {
         
         // Cast the first ray from shot placement to get target point
         Vector3 targetPoint = Crosshair.Instance.ShotPlacementToRaycastHit().point;
@@ -511,15 +542,18 @@ public abstract class BaseGun : MonoBehaviour
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
         Ray ray = new Ray(firePoint.position, targetPoint - firePoint.position);
+        Vector3 expectedHitPoint = new Vector3();
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             expectedHitPoint = hit.point;
             targetDistance = hit.distance;
         }
 
         // Convert MOA to radians
-        float spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
+        float spreadRadians;
         if (aiming) {
             spreadRadians = adsSpreadMOA * Mathf.Deg2Rad / 60f;
+        } else {
+            spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
         }
         // Calculate the spread based on the distance to the target
         float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
@@ -529,19 +563,7 @@ public abstract class BaseGun : MonoBehaviour
         // Apply random spread
         shootingDirection.x += Random.Range(-spreadAtDistance, spreadAtDistance);
         shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
-        
-        // Instantiate the bullet
-        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
-        bullet.GetComponent<Rigidbody>().linearVelocity = shootingDirection * muzzleVelocity;
-        bullet.GetComponent<BaseBullet>().damage = maxDamage;
-
-        // Play the fire sound
-
-        if (fireSFX != null) {
-            audioSource.PlayOneShot(fireSFX, soundSignature);
-        }
-        // Move the crosshair to random direction
-        Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
+        return shootingDirection;
     }
 
     private FireMode[] fireModeList;
