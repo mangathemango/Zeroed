@@ -22,17 +22,17 @@ public class EnemySpawner : Singleton<EnemySpawner>
     {
         if (readyToSpawn)
         {
-            spawnEnemy();
+            SpawnEnemy();
             readyToSpawn = false;
-            Invoke("resetReadyToSpawn", spawnRate);
+            Invoke("ResetReadyToSpawn", spawnRate);
         }
     }
 
-    void resetReadyToSpawn() {
+    void ResetReadyToSpawn() {
         readyToSpawn = true;
     }
 
-    void spawnEnemy() {
+    void SpawnEnemy() {
         Vector3 spawnPosition = new Vector3(Random.Range(corner1.position.x, corner2.position.x), 2, Random.Range(corner1.position.z, corner2.position.z));
         Instantiate(enemyPrefab, spawnPosition, Quaternion.identity, enemyContainer.transform);
     }

@@ -189,7 +189,7 @@ public abstract class BaseGun : MonoBehaviour
         currentFireMode = defaultFireMode;
         currentAmmoInMag = ammoCapacity - 1;
         currentAmmoInChamber = 1;
-        setupFireModes();
+        SetupFireModes();
     }
 
 
@@ -360,7 +360,7 @@ public abstract class BaseGun : MonoBehaviour
                 hit.collider.gameObject.GetComponent<BaseEnemy>().TakeDamage(meleeDamage, firePoint.forward * meleeKnockback, meleeStaggerTimeSeconds);
             }
             meleeReady = false;
-            StartCoroutine(resetMelee());
+            StartCoroutine(ResetMelee());
             audioSource.PlayOneShot(meleeHitSFX, soundSignature / 2);  
         } else {
             audioSource.PlayOneShot(meleeMissSFX, soundSignature / 2);  
@@ -372,7 +372,7 @@ public abstract class BaseGun : MonoBehaviour
     /// * Resets meleeReady based on switchTime<br/>
     /// ! (I though switch time is supposed to be for switching between weapons, but I ain't the mechanics designer so don't blame me)<br/>
     /// </summary>
-    IEnumerator resetMelee() {
+    IEnumerator ResetMelee() {
         yield return new WaitForSeconds(switchTimeSeconds);
         meleeReady = true;
     }
@@ -549,7 +549,7 @@ public abstract class BaseGun : MonoBehaviour
     /// * Sets up the fire modes for the gun by putting the selected fire modes in an array<br/><br/>
     /// ? This is to cycle between the fire modes when switchFireMode() is called<br/>
     /// </summary>
-    private void setupFireModes() {
+    private void SetupFireModes() {
         List<FireMode> fireModes = new List<FireMode>();
         if (hasSemiFire) {
             fireModes.Add(FireMode.Semi);
@@ -570,7 +570,7 @@ public abstract class BaseGun : MonoBehaviour
     /// * Switches the fire mode of the gun<br/><br/>
     /// ? This is done by selecting the next fire mode in the fireModeList array<br/>
     /// </summary>
-    public void switchFireMode() {
+    public void SwitchFireMode() {
         int currentIndex = System.Array.IndexOf(fireModeList, currentFireMode);
         int nextIndex = (currentIndex + 1) % fireModeList.Length;
         currentFireMode = fireModeList[nextIndex];

@@ -70,16 +70,16 @@ public class UiUpdater: Singleton<UiUpdater> {
             Debug.LogError("Gun not found!");
         }
         if (currentGun != null) {
-            updateGunUI();
+            UpdateGunUI();
         }
     }
-    private void updateGunUI () {
-        updateAmmoText();
-        updateChamberUI();
-        updateFireMode();
-        updateGunName();
+    private void UpdateGunUI () {
+        UpdateAmmoText();
+        UpdateChamberUI();
+        UpdateFireMode();
+        UpdateGunName();
     }
-    private void updateAmmoText() {
+    private void UpdateAmmoText() {
         int currentAmmo = currentGun.currentAmmoInMag + currentGun.currentAmmoInChamber;
         ammoCountUI.text = currentAmmo.ToString();
         while (ammoCountUI.text.Length < 2) {
@@ -88,7 +88,7 @@ public class UiUpdater: Singleton<UiUpdater> {
     }
 
     private float currentReloadRotation = 0;
-    private void updateChamberUI() {
+    private void UpdateChamberUI() {
         if (currentGun.currentAmmoInChamber <= 0) {
             chamberUI.color = new Color(1f, 1f, 1f, 0.5f);
             chargeUI.color = new Color(1f, 1f, 1f, 0.5f);
@@ -107,11 +107,11 @@ public class UiUpdater: Singleton<UiUpdater> {
         }
     }
 
-    private void updateFireMode() {
+    private void UpdateFireMode() {
         fireModeUI.text = currentGun.currentFireMode.ToString().ToUpper();
     }
 
-    private void updateGunName() {
+    private void UpdateGunName() {
         gunNameUI.text = currentGun.gunName;
     }
 }
