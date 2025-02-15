@@ -8,12 +8,11 @@ using UnityEngine;
 ///! The crosshair currently has two components: the shot placement (square) and the shot origin (dot) <br/>
 ///! This is only implemented because of a previous recoil system. This will be merged into one later <br/><br/>
 ///
-///? As per current version, the crosshair's mobility is limitted by 2 invisible diagonal lines,<br/>
-///? from the player's position to both top corners to the screen. In this code, they're called "view diagonals"<br/>
+///? As per current version, the crosshair's mobility is limitted by 2 invisible diagonal lines, forming a V shape <br/>
+///? from the player's position to both top corners of the screen. In this code, they're called "view diagonals".<br/>
 ///? When the crosshair moves to either side of the view diagonals, the camera will rotate 45 degress on that way<br/><br/>
 ///
 /// TODO #1: Remove shot placement/ shot origin separation
-
 /// </summary>
 public class Crosshair : Singleton<Crosshair>
 {   
@@ -26,8 +25,8 @@ public class Crosshair : Singleton<Crosshair>
 
     public Transform placement {get {return shotPlacement;}}
     public bool shooting = false;
-    private Vector3 velocity = Vector3.zero;
-    private float smoothTime;
+    private Vector3 velocity = Vector3.zero; //! This does nothing
+    private float smoothTime; //! This does nothing
     private bool rotateCameraReady = true;
     private Transform player;
     [Range(1f, 10f)]
@@ -37,6 +36,8 @@ public class Crosshair : Singleton<Crosshair>
         // Locks the cursor in the center of the screen
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        // Getting references
         shotPlacement = GameObject.Find("Shot Placement UI").transform;
         shotOrigin = GameObject.Find("Shot Origin UI").transform;
         shotPlacement.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
@@ -45,7 +46,6 @@ public class Crosshair : Singleton<Crosshair>
         player = GameObject.Find("Player").transform;
     }
     
-    float minY;
     void Update()
     {
         // Get mouse movement delta
@@ -63,10 +63,30 @@ public class Crosshair : Singleton<Crosshair>
 
     }
 
+    float minY;
+    /// <summary>
+    ///* Clamps the crosshair inside the view diagonals <br/><br/>
+    ///
+    ///! Trigger warning: This part is really unoptimized   <br/><br/>
+    ///
+    ///? This is first done by calculating the minimum Y value the crosshair can have based on the X value. <br/>
+    ///? First, let's consider a diagonal line from the bottom left corner of the screen to the top right corner of the screen. <br/>
+    ///? The function of this line is: y = x * Screen.height / Screen.width. (function 1)<br/>
+    ///? Similarly, let's consider the diagonal line from the top left corner to the bottom right corner <br/>
+    ///? The function of this line is: y = Screen.height - x * Screen.height / Screen.width. (function 2)<br/>
+    ///? Therefore, to achieve our desired effect, we will use the first function if the crosshair is on the right half of the screen, <br/>
+    ///? and then use the second function if the crosshair is on the left half of the screen. <br/><br/>
+    ///
+    ///? However, we want the V shape to be centered on the player's position, since (function 1) and (function 2) is intersecting on the screen center<br/>
+    ///? Therefore, we need to subtract minY by the distance between the player's position on screen and the screen center <br/>
+    ///? Afterwards, we clamp the crosshair's Y position between the calculated minY and the screen height <br/><br/>
+    /// </summary>
     private void ClampCrosshairOnViewDiagonals() {
         if (shotPlacement.position.x > Screen.width / 2) {
+            // Shot placement is on the right side of the screen
             minY = shotOrigin.position.x * Screen.height / Screen.width;
         } else {
+            // Shot placement is on the left side of the screen
             minY = Screen.height - shotOrigin.position.x * Screen.height / Screen.width;
         }
         minY = minY - CameraManager.Instance.screenCenter.y + CameraManager.Instance.playerPositionOnScreen.y;
