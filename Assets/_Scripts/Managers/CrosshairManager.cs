@@ -16,21 +16,14 @@ using UnityEngine;
 /// </summary>
 public class Crosshair : Singleton<Crosshair>
 {   
-    [Range(0f, 0.5f)]
-    [SerializeField] private float minSmoothTime = 0f;
+
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
-    private Transform shotPlacement;
+    [SerializeField] private Transform shotPlacement;
     private Transform shotOrigin;
-
-    public Transform placement {get {return shotPlacement;}}
-    public bool shooting = false;
-    private Vector3 velocity = Vector3.zero; //! This does nothing
-    private float smoothTime; //! This does nothing
     private bool rotateCameraReady = true;
-    private Transform player;
-    [Range(1f, 10f)]
-    [SerializeField] private float stablizeRate = 2f; //! This does nothing
+    private Transform playerTransform;
+
     void Start()
     {
         // Locks the cursor in the center of the screen
@@ -42,8 +35,7 @@ public class Crosshair : Singleton<Crosshair>
         shotOrigin = GameObject.Find("Shot Origin UI").transform;
         shotPlacement.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         shotOrigin.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        smoothTime = minSmoothTime;
-        player = GameObject.Find("Player").transform;
+        playerTransform = GameObject.Find("Player").transform;
     }
     
     void Update()
@@ -103,7 +95,7 @@ public class Crosshair : Singleton<Crosshair>
         rotateCameraReady = false;
         Vector3 crosshairWorldpoint = ShotPlacementToRaycastHit().point;
         Vector3 lastCrosshairScreenPoint = shotPlacement.position;
-        Vector3 lastPlayerPosition = player.position;
+        Vector3 lastPlayerPosition = playerTransform.position;
         if (shotPlacement.position.x > Screen.width / 2) {
             CameraManager.Instance.RotateClockwise(45);
         } else {
@@ -112,7 +104,7 @@ public class Crosshair : Singleton<Crosshair>
         float timeElapsed = 0;
         while (timeElapsed < 0.3f) {
             timeElapsed += Time.deltaTime;
-            Vector3 currentPlayerPosition = player.position;
+            Vector3 currentPlayerPosition = playerTransform.position;
             crosshairWorldpoint += currentPlayerPosition - lastPlayerPosition;
             lastPlayerPosition = currentPlayerPosition;
             Vector3 currentCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
