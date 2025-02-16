@@ -200,7 +200,7 @@ public abstract class BaseGun : MonoBehaviour
     ///! (Note: Currently the gun can't look up or down on the cursor due to some visual bug)<br/>
     /// </summary>
     void LookAtCursor() {
-        Vector3 targetPosition = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        Vector3 targetPosition = Crosshair.Instance.CrosshairToRaycastHit().point;
         // Ignore the y axis of the Cursor
         targetPosition.y = transform.position.y;
         transform.LookAt(targetPosition);
@@ -292,7 +292,7 @@ public abstract class BaseGun : MonoBehaviour
         }
         CameraManager cameraManager = CameraManager.Instance.GetComponent<CameraManager>();
         while (aiming) {
-            Vector3 aimOffset = Crosshair.Instance.GetOriginDistanceFromCenter() * scopeMultiplier;
+            Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
             cameraManager.playerOffset = aimOffset * 10;
             yield return null;
         }
@@ -331,7 +331,7 @@ public abstract class BaseGun : MonoBehaviour
         }
         bool meleeHit;
 
-        Vector3 targetDirection = Crosshair.Instance.ShotOriginToRaycastHit().point - playerTransform.position;
+        Vector3 targetDirection = Crosshair.Instance.CrosshairToRaycastHit().point - playerTransform.position;
         RaycastHit hit;
         if (Physics.Raycast(playerTransform.transform.position, targetDirection, out hit, meleeRange)) {
             meleeHit = true;
@@ -522,7 +522,7 @@ public abstract class BaseGun : MonoBehaviour
     protected Vector3 GetShootingDirection() {
         
         // Cast the first ray from shot placement to get target point
-        Vector3 targetPoint = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        Vector3 targetPoint = Crosshair.Instance.CrosshairToRaycastHit().point;
         float targetDistance = 100f;
 
         // Cast the second ray from the firepoint to the target point to get the expected hit point
