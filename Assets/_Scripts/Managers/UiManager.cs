@@ -3,6 +3,9 @@ using TMPro;
 using Unity.VectorGraphics;
 using UnityEngine.UI;
 
+/// <summary>
+/// * Updates the UI elements of the game
+/// </summary>
 public class UiUpdater: Singleton<UiUpdater> {
     private PlayerInventory playerInventory;
     private GameObject currentWeapon; 

@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// * Spawns enemies in the game
+/// ! This is not a complete system. It's just a simple system that spawns enemies at random positions within a given area.
+/// ! This class is here solely to debug the shooting system.
+/// </summary>
 public class EnemySpawner : Singleton<EnemySpawner>
 {
     public Transform corner1;
