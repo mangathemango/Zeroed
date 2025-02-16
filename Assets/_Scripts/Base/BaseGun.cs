@@ -133,37 +133,22 @@ public abstract class BaseGun : MonoBehaviour
     public AudioClip chargeSFX;
     public AudioClip meleeMissSFX;
     public AudioClip meleeHitSFX;
-#if DEBUG
-    public PlayerMovement playerMovement;
-    public Transform playerPosition;
-    public AudioSource audioSource;
-    public FireMode currentFireMode;
-    public bool meleeReady = true;
-    public bool autoFireReady = true;
-    public bool semiFireReady = true;
-    public bool burstFireReady = true;
-    public int currentAmmoInMag;
-    public int currentAmmoInChamber;
-    public bool triggerPressed = false;
-    public bool charging = false;
-    public bool reloading = false;
-    public bool aiming = false;
-#else
-    [System.NonSerialized] public Transform player;
-    [System.NonSerialized] public AudioSource audioSource;
-    [System.NonSerialized] public RotateAround rotateAround;
-    [System.NonSerialized] public FireMode currentFireMode;
-    [System.NonSerialized] public bool meleeReady = true;
-    [System.NonSerialized] public bool autoFireReady = true;
-    [System.NonSerialized] public bool semiFireReady = true;
-    [System.NonSerialized] public bool burstFireReady = true;
-    [System.NonSerialized] public int currentAmmoInMag;
-    [System.NonSerialized] public int currentAmmoInChamber;
-    [System.NonSerialized] public bool triggerPressed = false;
-    [System.NonSerialized] public bool charging = false;
-    [System.NonSerialized] public bool reloading = false;
-    [System.NonSerialized] public bool aiming = false;
-#endif
+
+    [HideInInspector] public PlayerMovement playerMovement;
+    [HideInInspector] public Transform playerTransform;
+    [HideInInspector] public AudioSource audioSource;
+    [HideInInspector] public FireMode currentFireMode;
+    [HideInInspector] public bool meleeReady = true;
+    [HideInInspector] public bool autoFireReady = true;
+    [HideInInspector] public bool semiFireReady = true;
+    [HideInInspector] public bool burstFireReady = true;
+    [HideInInspector] public int currentAmmoInMag;
+    [HideInInspector] public int currentAmmoInChamber;
+    [HideInInspector] public bool triggerPressed = false;
+    [HideInInspector] public bool charging = false;
+    [HideInInspector] public bool reloading = false;
+    [HideInInspector] public bool aiming = false;
+
 
     [Header("Internal")]
     private bool aimCoroutineRunning = false;
@@ -178,7 +163,7 @@ public abstract class BaseGun : MonoBehaviour
     {
         // Setup References
         GameObject player = GameObject.Find("Player");
-        playerPosition = player.transform;
+        playerTransform = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
 
         if (audioSource == null) {
@@ -227,9 +212,9 @@ public abstract class BaseGun : MonoBehaviour
     ///? This function is paired with LookAtCursor() to make the gun look at the cursor<br/>
     /// </summary>
     void RotateAroundPlayer () {
-        transform.RotateAround(playerPosition.position, Vector3.up, transform.rotation.y);
+        transform.RotateAround(playerTransform.position, Vector3.up, transform.rotation.y);
         // Moves the gun a bit forward so it doesn't clip with the player
-        transform.position = playerPosition.position + (transform.rotation * Vector3.forward);
+        transform.position = playerTransform.position + (transform.rotation * Vector3.forward);
     }
 
 
@@ -346,9 +331,9 @@ public abstract class BaseGun : MonoBehaviour
         }
         bool meleeHit;
 
-        Vector3 targetDirection = Crosshair.Instance.ShotOriginToRaycastHit().point - playerPosition.position;
+        Vector3 targetDirection = Crosshair.Instance.ShotOriginToRaycastHit().point - playerTransform.position;
         RaycastHit hit;
-        if (Physics.Raycast(playerPosition.transform.position, targetDirection, out hit, meleeRange)) {
+        if (Physics.Raycast(playerTransform.transform.position, targetDirection, out hit, meleeRange)) {
             meleeHit = true;
         } else {
             meleeHit = false;
