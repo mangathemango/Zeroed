@@ -104,27 +104,41 @@ public class Crosshair : Singleton<Crosshair>
             yield break;
         }
         rotateCameraReady = false;
-        Vector3 crosshairWorldpoint = CrosshairToRaycastHit().point;
-        Vector3 lastCrosshairScreenPoint = crosshair.position;
-        Vector3 lastPlayerPosition = playerTransform.position;
         if (crosshair.position.x > Screen.width / 2) {
             CameraManager.Instance.RotateClockwise(45);
         } else {
             CameraManager.Instance.RotateCounterclockwise(45);
         }
+
+        Vector3 crosshairWorldpoint = CrosshairToRaycastHit().point;
+        Vector3 lastCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
         float timeElapsed = 0;
         while (timeElapsed < 0.3f) {
             timeElapsed += Time.deltaTime;
-            Vector3 currentPlayerPosition = playerTransform.position;
-            crosshairWorldpoint += currentPlayerPosition - lastPlayerPosition;
-            lastPlayerPosition = currentPlayerPosition;
+            crosshairWorldpoint += PlayerPositionDelta();
+
             Vector3 currentCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
-            crosshair.position += currentCrosshairScreenPoint - lastCrosshairScreenPoint;
+            Vector3 crosshairScreenPointDelta = currentCrosshairScreenPoint - lastCrosshairScreenPoint;
             lastCrosshairScreenPoint = currentCrosshairScreenPoint;
+
+            crosshair.position += crosshairScreenPointDelta;
             yield return null;
         }
         rotateCameraReady = true;
     }
+
+    [HideInInspector] private Vector3 lastPlayerPosition;
+    private Vector3 PlayerPositionDelta() {
+        if (lastPlayerPosition == null) {
+            lastPlayerPosition = playerTransform.position;
+            return Vector3.zero;
+        }
+        Vector3 currentPlayerPosition = playerTransform.position;
+        Vector3 delta = currentPlayerPosition - lastPlayerPosition;
+        lastPlayerPosition = currentPlayerPosition;
+        return delta;
+    }
+
     public Vector3 GetCrosshairDistanceFromCenter()
     {
         return new Vector3(
@@ -133,8 +147,6 @@ public class Crosshair : Singleton<Crosshair>
             0
         );
     }
-
-
 
     public Ray CrosshairToRay()
     {
