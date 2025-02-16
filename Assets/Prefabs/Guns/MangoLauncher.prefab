@@ -92,6 +92,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -132,6 +135,7 @@ MonoBehaviour:
   gunName: Mango Launcher
   ammoType: {fileID: 6661516185590720827, guid: c028ae1e7150b0f4d8e758263bd236e7, type: 3}
   ammoCapacity: 20
+  chamberCapacity: 1
   mass: 0.1
   muzzleVelocity: 52
   soundSignature: 1
@@ -160,7 +164,7 @@ MonoBehaviour:
   pelletSpreadMOA: 2
   recoilY: 5
   recoilX: 0
-  Optics: 2
+  optics: {fileID: 11400000, guid: 63f86a43a2db214408b27063378da948, type: 2}
   meleeDamage: 10
   meleeRange: 2
   meleeKnockback: 1
@@ -174,9 +178,8 @@ MonoBehaviour:
   meleeMissSFX: {fileID: 8300000, guid: f7910e15066f09f4381e23dfc1d79cf4, type: 3}
   meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
   playerMovement: {fileID: 0}
-  playerPosition: {fileID: 0}
+  playerTransform: {fileID: 0}
   audioSource: {fileID: 0}
-  rotateAround: {fileID: 0}
   currentFireMode: 0
   meleeReady: 1
   autoFireReady: 1

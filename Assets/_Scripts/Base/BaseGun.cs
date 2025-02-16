@@ -26,14 +26,6 @@ public enum AmmoType {
     _12_Gauge,
 }
 
-public enum OpticType {
-    None,
-    x1,
-    x2,
-    x3,
-    x4
-}
-
 /// <summary>
 /// * Base gun class for all guns in the game
 /// </summary>
@@ -110,7 +102,7 @@ public abstract class BaseGun : MonoBehaviour
     public float recoilX = 1.0f;
 
     [Header("Attachments")]
-    public OpticType Optics = OpticType.None;
+    public OpticsData optics;
 
     [Header("Melee")]
     public float meleeDamage = 10.0f;
@@ -266,31 +258,18 @@ public abstract class BaseGun : MonoBehaviour
             yield break;
         }
         aimCoroutineRunning = true;
-        float scopeMultiplier;
-        switch (Optics) {
-            case OpticType.x1:
-                scopeMultiplier = 1.0f;
-                break;
-            case OpticType.x2:
-                scopeMultiplier = 2.0f;
-                break;
-            case OpticType.x3:
-                scopeMultiplier = 3.0f;
-                break;
-            case OpticType.x4:
-                scopeMultiplier = 4.0f;
-                break;
-            default:
-                scopeMultiplier = 1.0f;
-                break;
-        }
-        CameraManager cameraManager = CameraManager.Instance.GetComponent<CameraManager>();
         while (aiming) {
-            Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
-            cameraManager.playerOffset = aimOffset * 10;
+            Vector3 aimOffset;
+            if (optics != null) {
+                aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * optics.scopeMultiplier;
+            } else {
+                aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter();
+            }
+
+            CameraManager.Instance.playerOffset = aimOffset * 10;
             yield return null;
         }
-        cameraManager.playerOffset = Vector3.zero;
+        CameraManager.Instance.playerOffset = Vector3.zero;
         aimCoroutineRunning = false;
     }
 
