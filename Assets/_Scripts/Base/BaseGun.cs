@@ -1,12 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-using Unity.VectorGraphics;
-using UnityEngine.UI;
-using System.Runtime.CompilerServices;
-using UnityEditor.Callbacks;
-using UnityEditor.SceneManagement;
 
 
 //! Some of these enums will be replaced with ScriptableObjects in the future
