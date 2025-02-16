@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class UiUpdater: Singleton<UiUpdater> {
     private PlayerInventory playerInventory;
     private GameObject currentWeapon; 
+    private BaseGun currentGun;
     [SerializeField] private TextMeshProUGUI ammoCountUI;
     [SerializeField] private TextMeshProUGUI fireModeUI;
     [SerializeField] private TextMeshProUGUI gunNameUI;
     [SerializeField] private SVGImage chamberUI;
     [SerializeField] private SVGImage chargeUI;
     [SerializeField] private RawImage ReloadingUI;
-    [SerializeField] private BaseGun currentGun;
     private void Start () {
 
         if (playerInventory == null) {
