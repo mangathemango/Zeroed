@@ -17,7 +17,7 @@ public class CameraManager : Singleton<CameraManager> {
     public Vector3 basePlayerOffset;
 
     public Vector3 playerPositionOnScreen {get {
-        return Camera.main.WorldToScreenPoint(playerPosition.position);
+        return Camera.main.WorldToScreenPoint(playerTransform.position);
     }}
     public Vector3 screenCenter {get {
         return new Vector3 (
@@ -30,8 +30,7 @@ public class CameraManager : Singleton<CameraManager> {
     // TODO: This probably needs a better name
     [NonSerialized] public Vector3 playerOffset = Vector3.zero;
     [NonSerialized] private PlayerMovement playerMovement;
-    // TODO: Rename this to playerTransform
-    [NonSerialized] private Transform playerPosition;
+    [NonSerialized] private Transform playerTransform;
     [NonSerialized] private Vector3 playerFollowVelocity = Vector3.zero;
     [NonSerialized] private Vector3 cameraVelocity = Vector3.zero;
 
@@ -41,9 +40,9 @@ public class CameraManager : Singleton<CameraManager> {
     /// </summary>
     void Start () {
         GameObject player = GameObject.Find("Player");
-        playerPosition = player.transform;
+        playerTransform = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
-        cameraFollow.position = playerPosition.position;
+        cameraFollow.position = playerTransform.position;
     }
 
     /// <summary>
@@ -53,7 +52,7 @@ public class CameraManager : Singleton<CameraManager> {
     /// </summary>
     void Update() {
         // Get target position for cameraFollow object
-        Vector3 targetPosition = playerPosition.position + playerMovement.ConvertToPlayerDirection(playerOffset + basePlayerOffset);
+        Vector3 targetPosition = playerTransform.position + playerMovement.ConvertToPlayerDirection(playerOffset + basePlayerOffset);
 
         // Smoothly move the cameraFollow object to the target position
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref playerFollowVelocity, smoothTime);

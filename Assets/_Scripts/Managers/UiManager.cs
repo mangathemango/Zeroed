@@ -3,16 +3,19 @@ using TMPro;
 using Unity.VectorGraphics;
 using UnityEngine.UI;
 
+/// <summary>
+/// * Updates the UI elements of the game
+/// </summary>
 public class UiUpdater: Singleton<UiUpdater> {
     private PlayerInventory playerInventory;
     private GameObject currentWeapon; 
-    private TextMeshProUGUI ammoCountUI;
-    private TextMeshProUGUI fireModeUI;
-    private TextMeshProUGUI gunNameUI;
-    private SVGImage chamberUI;
-    private SVGImage chargeUI;
-    private RawImage ReloadingUI;
     private BaseGun currentGun;
+    [SerializeField] private TextMeshProUGUI ammoCountUI;
+    [SerializeField] private TextMeshProUGUI fireModeUI;
+    [SerializeField] private TextMeshProUGUI gunNameUI;
+    [SerializeField] private SVGImage chamberUI;
+    [SerializeField] private SVGImage chargeUI;
+    [SerializeField] private RawImage ReloadingUI;
     private void Start () {
 
         if (playerInventory == null) {
@@ -70,16 +73,16 @@ public class UiUpdater: Singleton<UiUpdater> {
             Debug.LogError("Gun not found!");
         }
         if (currentGun != null) {
-            updateGunUI();
+            UpdateGunUI();
         }
     }
-    private void updateGunUI () {
-        updateAmmoText();
-        updateChamberUI();
-        updateFireMode();
-        updateGunName();
+    private void UpdateGunUI () {
+        UpdateAmmoText();
+        UpdateChamberUI();
+        UpdateFireMode();
+        UpdateGunName();
     }
-    private void updateAmmoText() {
+    private void UpdateAmmoText() {
         int currentAmmo = currentGun.currentAmmoInMag + currentGun.currentAmmoInChamber;
         ammoCountUI.text = currentAmmo.ToString();
         while (ammoCountUI.text.Length < 2) {
@@ -88,7 +91,7 @@ public class UiUpdater: Singleton<UiUpdater> {
     }
 
     private float currentReloadRotation = 0;
-    private void updateChamberUI() {
+    private void UpdateChamberUI() {
         if (currentGun.currentAmmoInChamber <= 0) {
             chamberUI.color = new Color(1f, 1f, 1f, 0.5f);
             chargeUI.color = new Color(1f, 1f, 1f, 0.5f);
@@ -107,11 +110,11 @@ public class UiUpdater: Singleton<UiUpdater> {
         }
     }
 
-    private void updateFireMode() {
+    private void UpdateFireMode() {
         fireModeUI.text = currentGun.currentFireMode.ToString().ToUpper();
     }
 
-    private void updateGunName() {
+    private void UpdateGunName() {
         gunNameUI.text = currentGun.gunName;
     }
 }

@@ -7,21 +7,21 @@ public class PlayerInventory : MonoBehaviour
     [NonSerialized] public GameObject currentWeapon;
     private void Start()
     {
-        holdWeapon();
+        HoldWeapon();
     }
 
     private void Update()
     {
         if (currentWeapon == null)
         {
-            holdWeapon();
+            HoldWeapon();
         }
     }
-    void holdWeapon() {
+    void HoldWeapon() {
         currentWeapon = Instantiate(weaponPrefab, transform.position, transform.rotation, transform);
         BaseGun gun = currentWeapon.GetComponent<BaseGun>();
         if (gun != null) {
-            gun.playerPosition = transform;
+            gun.playerTransform = transform;
         }
     }
 }

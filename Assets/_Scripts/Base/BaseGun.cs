@@ -133,37 +133,22 @@ public abstract class BaseGun : MonoBehaviour
     public AudioClip chargeSFX;
     public AudioClip meleeMissSFX;
     public AudioClip meleeHitSFX;
-#if DEBUG
-    public PlayerMovement playerMovement;
-    public Transform playerPosition;
-    public AudioSource audioSource;
-    public FireMode currentFireMode;
-    public bool meleeReady = true;
-    public bool autoFireReady = true;
-    public bool semiFireReady = true;
-    public bool burstFireReady = true;
-    public int currentAmmoInMag;
-    public int currentAmmoInChamber;
-    public bool triggerPressed = false;
-    public bool charging = false;
-    public bool reloading = false;
-    public bool aiming = false;
-#else
-    [System.NonSerialized] public Transform player;
-    [System.NonSerialized] public AudioSource audioSource;
-    [System.NonSerialized] public RotateAround rotateAround;
-    [System.NonSerialized] public FireMode currentFireMode;
-    [System.NonSerialized] public bool meleeReady = true;
-    [System.NonSerialized] public bool autoFireReady = true;
-    [System.NonSerialized] public bool semiFireReady = true;
-    [System.NonSerialized] public bool burstFireReady = true;
-    [System.NonSerialized] public int currentAmmoInMag;
-    [System.NonSerialized] public int currentAmmoInChamber;
-    [System.NonSerialized] public bool triggerPressed = false;
-    [System.NonSerialized] public bool charging = false;
-    [System.NonSerialized] public bool reloading = false;
-    [System.NonSerialized] public bool aiming = false;
-#endif
+
+    [HideInInspector] public PlayerMovement playerMovement;
+    [HideInInspector] public Transform playerTransform;
+    [HideInInspector] public AudioSource audioSource;
+    [HideInInspector] public FireMode currentFireMode;
+    [HideInInspector] public bool meleeReady = true;
+    [HideInInspector] public bool autoFireReady = true;
+    [HideInInspector] public bool semiFireReady = true;
+    [HideInInspector] public bool burstFireReady = true;
+    [HideInInspector] public int currentAmmoInMag;
+    [HideInInspector] public int currentAmmoInChamber;
+    [HideInInspector] public bool triggerPressed = false;
+    [HideInInspector] public bool charging = false;
+    [HideInInspector] public bool reloading = false;
+    [HideInInspector] public bool aiming = false;
+
 
     [Header("Internal")]
     private bool aimCoroutineRunning = false;
@@ -178,7 +163,7 @@ public abstract class BaseGun : MonoBehaviour
     {
         // Setup References
         GameObject player = GameObject.Find("Player");
-        playerPosition = player.transform;
+        playerTransform = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
 
         if (audioSource == null) {
@@ -189,7 +174,7 @@ public abstract class BaseGun : MonoBehaviour
         currentFireMode = defaultFireMode;
         currentAmmoInMag = ammoCapacity - 1;
         currentAmmoInChamber = 1;
-        setupFireModes();
+        SetupFireModes();
     }
 
 
@@ -215,7 +200,7 @@ public abstract class BaseGun : MonoBehaviour
     ///! (Note: Currently the gun can't look up or down on the cursor due to some visual bug)<br/>
     /// </summary>
     void LookAtCursor() {
-        Vector3 targetPosition = Crosshair.Instance.ShotPlacementToRaycastHit().point;
+        Vector3 targetPosition = Crosshair.Instance.CrosshairToRaycastHit().point;
         // Ignore the y axis of the Cursor
         targetPosition.y = transform.position.y;
         transform.LookAt(targetPosition);
@@ -227,9 +212,9 @@ public abstract class BaseGun : MonoBehaviour
     ///? This function is paired with LookAtCursor() to make the gun look at the cursor<br/>
     /// </summary>
     void RotateAroundPlayer () {
-        transform.RotateAround(playerPosition.position, Vector3.up, transform.rotation.y);
+        transform.RotateAround(playerTransform.position, Vector3.up, transform.rotation.y);
         // Moves the gun a bit forward so it doesn't clip with the player
-        transform.position = playerPosition.position + (transform.rotation * Vector3.forward);
+        transform.position = playerTransform.position + (transform.rotation * Vector3.forward);
     }
 
 
@@ -307,7 +292,7 @@ public abstract class BaseGun : MonoBehaviour
         }
         CameraManager cameraManager = CameraManager.Instance.GetComponent<CameraManager>();
         while (aiming) {
-            Vector3 aimOffset = Crosshair.Instance.GetOriginDistanceFromCenter() * scopeMultiplier;
+            Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
             cameraManager.playerOffset = aimOffset * 10;
             yield return null;
         }
@@ -346,9 +331,9 @@ public abstract class BaseGun : MonoBehaviour
         }
         bool meleeHit;
 
-        Vector3 targetDirection = Crosshair.Instance.ShotOriginToRaycastHit().point - playerPosition.position;
+        Vector3 targetDirection = Crosshair.Instance.CrosshairToRaycastHit().point - playerTransform.position;
         RaycastHit hit;
-        if (Physics.Raycast(playerPosition.transform.position, targetDirection, out hit, meleeRange)) {
+        if (Physics.Raycast(playerTransform.transform.position, targetDirection, out hit, meleeRange)) {
             meleeHit = true;
         } else {
             meleeHit = false;
@@ -360,7 +345,7 @@ public abstract class BaseGun : MonoBehaviour
                 hit.collider.gameObject.GetComponent<BaseEnemy>().TakeDamage(meleeDamage, firePoint.forward * meleeKnockback, meleeStaggerTimeSeconds);
             }
             meleeReady = false;
-            StartCoroutine(resetMelee());
+            StartCoroutine(ResetMelee());
             audioSource.PlayOneShot(meleeHitSFX, soundSignature / 2);  
         } else {
             audioSource.PlayOneShot(meleeMissSFX, soundSignature / 2);  
@@ -372,7 +357,7 @@ public abstract class BaseGun : MonoBehaviour
     /// * Resets meleeReady based on switchTime<br/>
     /// ! (I though switch time is supposed to be for switching between weapons, but I ain't the mechanics designer so don't blame me)<br/>
     /// </summary>
-    IEnumerator resetMelee() {
+    IEnumerator ResetMelee() {
         yield return new WaitForSeconds(switchTimeSeconds);
         meleeReady = true;
     }
@@ -491,52 +476,21 @@ public abstract class BaseGun : MonoBehaviour
     /// 
     /// ? This function handles every action required to fire a gun: Reduce ammo, calculate spread, instantiate bullet, <br/>
     /// ? calculate damage, recoil etc.<br/>
-    /// TODO: Split each action into separate functions for better readability. <br/>
     /// TODO: Implement damage calculation based on range. <br/>
     /// </summary>
     protected virtual void Fire() {
         currentAmmoInChamber -= 1;
-        if (currentAmmoInMag >= 1 && !reloading) {
-            if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
-                currentAmmoInMag -= 1;
-                currentAmmoInChamber += 1;
-            }
+        if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
+            // Automatically charge the gun if gun doesn't require charging between shots
+            AutoCharge();
         }
-
-        Vector3 expectedHitPoint = new Vector3();
-        
-        // Cast the first ray from shot placement to get target point
-        Vector3 targetPoint = Crosshair.Instance.ShotPlacementToRaycastHit().point;
-        float targetDistance = 100f;
-
-        // Cast the second ray from the firepoint to the target point to get the expected hit point
-        Ray ray = new Ray(firePoint.position, targetPoint - firePoint.position);
-        if (Physics.Raycast(ray, out RaycastHit hit)) {
-            expectedHitPoint = hit.point;
-            targetDistance = hit.distance;
-        }
-
-        // Convert MOA to radians
-        float spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
-        if (aiming) {
-            spreadRadians = adsSpreadMOA * Mathf.Deg2Rad / 60f;
-        }
-        // Calculate the spread based on the distance to the target
-        float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
-
-        
-        Vector3 shootingDirection = (expectedHitPoint - firePoint.position).normalized;
-        // Apply random spread
-        shootingDirection.x += Random.Range(-spreadAtDistance, spreadAtDistance);
-        shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
         
         // Instantiate the bullet
         GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
-        bullet.GetComponent<Rigidbody>().linearVelocity = shootingDirection * muzzleVelocity;
+        bullet.GetComponent<Rigidbody>().linearVelocity = GetShootingDirection() * muzzleVelocity;
         bullet.GetComponent<BaseBullet>().damage = maxDamage;
 
         // Play the fire sound
-
         if (fireSFX != null) {
             audioSource.PlayOneShot(fireSFX, soundSignature);
         }
@@ -544,12 +498,65 @@ public abstract class BaseGun : MonoBehaviour
         Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
     }
 
+    /// <summary>
+    /// * Automatically charges the gun<br/><br/>
+    /// 
+    /// ? Different from Charge(), this function is called after the player shoots the gun, not when the player presses any button<br/>
+    /// </summary>
+    protected void AutoCharge() {
+        if (reloading || charging) {
+            return;
+        }
+        if (currentAmmoInMag <= 0) {
+            return;
+        }
+        currentAmmoInMag -= 1;
+        currentAmmoInChamber += 1;
+    }
+
+    /// <summary>
+    /// * Gets the shooting direction based on the shot placement position and spread of the gun<br/><br/>
+    /// ? To view how this is done, check the comments inside this function<br/>
+    /// </summary>
+    /// <returns>The bullet's expected firing direction</returns>
+    protected Vector3 GetShootingDirection() {
+        
+        // Cast the first ray from shot placement to get target point
+        Vector3 targetPoint = Crosshair.Instance.CrosshairToRaycastHit().point;
+        float targetDistance = 100f;
+
+        // Cast the second ray from the firepoint to the target point to get the expected hit point
+        Ray ray = new Ray(firePoint.position, targetPoint - firePoint.position);
+        Vector3 expectedHitPoint = new Vector3();
+        if (Physics.Raycast(ray, out RaycastHit hit)) {
+            expectedHitPoint = hit.point;
+            targetDistance = hit.distance;
+        }
+
+        // Convert MOA to radians
+        float spreadRadians;
+        if (aiming) {
+            spreadRadians = adsSpreadMOA * Mathf.Deg2Rad / 60f;
+        } else {
+            spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
+        }
+        // Calculate the spread based on the distance to the target
+        float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
+
+        
+        Vector3 shootingDirection = expectedHitPoint - firePoint.position;
+        // Apply random spread
+        shootingDirection.x += Random.Range(-spreadAtDistance, spreadAtDistance);
+        shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
+        return shootingDirection.normalized;
+    }
+
     private FireMode[] fireModeList;
     /// <summary>
     /// * Sets up the fire modes for the gun by putting the selected fire modes in an array<br/><br/>
     /// ? This is to cycle between the fire modes when switchFireMode() is called<br/>
     /// </summary>
-    private void setupFireModes() {
+    private void SetupFireModes() {
         List<FireMode> fireModes = new List<FireMode>();
         if (hasSemiFire) {
             fireModes.Add(FireMode.Semi);
@@ -570,7 +577,7 @@ public abstract class BaseGun : MonoBehaviour
     /// * Switches the fire mode of the gun<br/><br/>
     /// ? This is done by selecting the next fire mode in the fireModeList array<br/>
     /// </summary>
-    public void switchFireMode() {
+    public void SwitchFireMode() {
         int currentIndex = System.Array.IndexOf(fireModeList, currentFireMode);
         int nextIndex = (currentIndex + 1) % fireModeList.Length;
         currentFireMode = fireModeList[nextIndex];

@@ -1293,7 +1293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraFollow: {fileID: 29198788}
   offset: {x: 100, y: 100, z: -100}
-  smoothTime: 0.1
+  smoothTime: 0.2
   basePlayerOffset: {x: 0, y: 0, z: 6}
 --- !u!1 &981555635
 GameObject:
@@ -1398,73 +1398,6 @@ Transform:
   - {fileID: 1646230961}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1047907044
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1047907045}
-  - component: {fileID: 1047907047}
-  - component: {fileID: 1047907046}
-  m_Layer: 5
-  m_Name: Shot Origin UI
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1047907045
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047907044}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.06138704, y: 0.06138704, z: 0.06138704}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1102809859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1047907046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047907044}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef8b96895a0ec4ba685178a052544251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 3286163911610860551, guid: a7a818e7c0733df4eb74bd8c4e01b298, type: 3}
-  m_PreserveAspect: 0
---- !u!222 &1047907047
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047907044}
-  m_CullTransparentMesh: 1
 --- !u!1 &1086593820
 GameObject:
   m_ObjectHideFlags: 0
@@ -1698,7 +1631,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1047907045}
   - {fileID: 1951160706}
   m_Father: {fileID: 1863285082}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2803,10 +2735,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 400736f18a102904d9774856029153bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSmoothTime: 0.1
   sensitivity: 10
-  shooting: 0
-  stablizeRate: 2.3
+  crosshair: {fileID: 1951160706}
 --- !u!1 &1647887480
 GameObject:
   m_ObjectHideFlags: 0
@@ -3798,6 +3728,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a8e4785dd60ade4faea056438757124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ammoCountUI: {fileID: 1306276527}
+  fireModeUI: {fileID: 1488295045}
+  gunNameUI: {fileID: 1384317175}
+  chamberUI: {fileID: 1668915220}
+  chargeUI: {fileID: 699894139}
+  ReloadingUI: {fileID: 1867778794}
 --- !u!1 &1971014180
 GameObject:
   m_ObjectHideFlags: 0
@@ -3808,7 +3744,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1971014181}
   - component: {fileID: 1971014183}
-  - component: {fileID: 1971014182}
   m_Layer: 0
   m_Name: Enemy Manager
   m_TagString: Untagged
@@ -3831,22 +3766,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1046082860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1971014182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1971014180}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd0a971b9e4efb841a9ef4aa56676027, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  corner1: {fileID: 604855884}
-  corner2: {fileID: 1936558227}
-  enemyPrefab: {fileID: 392854982787144276, guid: 17c4a46e99b59304a8cfab8fa362d5a7, type: 3}
-  spawnRate: 1
 --- !u!114 &1971014183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3854,7 +3773,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1971014180}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd0a971b9e4efb841a9ef4aa56676027, type: 3}
   m_Name: 
