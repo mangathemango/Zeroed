@@ -17,8 +17,11 @@ public class Crosshair : Singleton<Crosshair>
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
     [SerializeField] private Transform crosshair;
-    private bool rotateCameraReady = true;
+
     private Transform playerTransform;
+
+    private float minY;
+    private bool rotateCameraReady = true;
 
     void Start()
     {
@@ -38,16 +41,18 @@ public class Crosshair : Singleton<Crosshair>
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
         crosshair.position += new Vector3(mouseX, mouseY, 0);
-        ClampCrosshairOnViewDiagonals();
+        ClampCrosshairOnViewDiagonals(out bool cursorIsOnViewDiagonals);
         
-        if (crosshair.position.normalized == new Vector3(crosshair.position.x,minY,0).normalized && rotateCameraReady) {
-            StartCoroutine(RotateCamera());
+        if (cursorIsOnViewDiagonals && rotateCameraReady) {
+            RotateCamera();
             rotateCameraReady = false;
+            float followDuration = 0.5f;
+            StartCoroutine(FollowCrosshairWorldPoint(followDuration));
+            StartCoroutine(ResetCameraReady(followDuration));
         }
 
     }
 
-    float minY;
     /// <summary>
     /// * Clamps the crosshair inside the view diagonals <br/><br/>
     /// 
@@ -55,13 +60,14 @@ public class Crosshair : Singleton<Crosshair>
     /// ? This is done in the getMinY function. <br/><br/>
     /// ? After that, the crosshair's position is clamped between the screen's edges and the minimum Y value. <br/>
     /// </summary>
-    private void ClampCrosshairOnViewDiagonals() {
+    private void ClampCrosshairOnViewDiagonals(out bool cursorIsOnViewDiagonals) {
         minY = GetMinY(crosshair.position.x);
         crosshair.position = new Vector3(
             Mathf.Clamp(crosshair.position.x, 0  , Screen.width),
             Mathf.Clamp(crosshair.position.y,minY, Screen.height),
             0
         );
+        cursorIsOnViewDiagonals = (crosshair.position.y == minY) && (minY > (CameraManager.Instance.playerPositionOnScreen.y + 20));
     }
 
     /// <summary>
@@ -99,44 +105,46 @@ public class Crosshair : Singleton<Crosshair>
 
         return minY;
     }
-    private IEnumerator RotateCamera() {
-        if (!rotateCameraReady) {
-            yield break;
-        }
-        rotateCameraReady = false;
+
+    private void RotateCamera() {
         if (crosshair.position.x > Screen.width / 2) {
             CameraManager.Instance.RotateClockwise(45);
         } else {
             CameraManager.Instance.RotateCounterclockwise(45);
         }
-
-        Vector3 crosshairWorldpoint = CrosshairToRaycastHit().point;
-        Vector3 lastCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
-        float timeElapsed = 0;
-        while (timeElapsed < 0.3f) {
-            timeElapsed += Time.deltaTime;
-            crosshairWorldpoint += PlayerPositionDelta();
-
-            Vector3 currentCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
-            Vector3 crosshairScreenPointDelta = currentCrosshairScreenPoint - lastCrosshairScreenPoint;
-            lastCrosshairScreenPoint = currentCrosshairScreenPoint;
-
-            crosshair.position += crosshairScreenPointDelta;
-            yield return null;
-        }
-        rotateCameraReady = true;
     }
 
-    [HideInInspector] private Vector3 lastPlayerPosition;
-    private Vector3 PlayerPositionDelta() {
-        if (lastPlayerPosition == null) {
-            lastPlayerPosition = playerTransform.position;
-            return Vector3.zero;
+    private IEnumerator FollowCrosshairWorldPoint(float followTime) {
+        Vector3 crosshairWorldpoint = CrosshairToRaycastHit().point;
+        Vector3 lastCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
+        Vector3 lastPlayerPosition = playerTransform.position;
+
+        Vector3 PlayerPositionDelta() {
+            Vector3 currentPlayerPosition = playerTransform.position;
+            Vector3 delta = currentPlayerPosition - lastPlayerPosition;
+            lastPlayerPosition = currentPlayerPosition;
+            return delta;
         }
-        Vector3 currentPlayerPosition = playerTransform.position;
-        Vector3 delta = currentPlayerPosition - lastPlayerPosition;
-        lastPlayerPosition = currentPlayerPosition;
-        return delta;
+        
+        Vector3 CrosshairScreenPointDelta() {
+            Vector3 currentCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
+            Vector3 delta = currentCrosshairScreenPoint - lastCrosshairScreenPoint;
+            lastCrosshairScreenPoint = currentCrosshairScreenPoint;
+            return delta;
+        }
+
+        float timeElapsed = 0;
+        while (timeElapsed < followTime) {
+            timeElapsed += Time.deltaTime;
+            crosshairWorldpoint += PlayerPositionDelta();
+            crosshair.position += CrosshairScreenPointDelta();
+            yield return null;
+        }
+    }
+
+    private IEnumerator ResetCameraReady(float time) {
+        yield return new WaitForSeconds(time);
+        rotateCameraReady = true;
     }
 
     public Vector3 GetCrosshairDistanceFromCenter()
