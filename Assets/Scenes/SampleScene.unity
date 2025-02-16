@@ -1293,7 +1293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraFollow: {fileID: 29198788}
   offset: {x: 100, y: 100, z: -100}
-  smoothTime: 0.1
+  smoothTime: 0.2
   basePlayerOffset: {x: 0, y: 0, z: 6}
 --- !u!1 &981555635
 GameObject:
@@ -3798,6 +3798,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a8e4785dd60ade4faea056438757124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ammoCountUI: {fileID: 1306276527}
+  fireModeUI: {fileID: 1488295045}
+  gunNameUI: {fileID: 1384317175}
+  chamberUI: {fileID: 1668915220}
+  chargeUI: {fileID: 699894139}
+  ReloadingUI: {fileID: 1867778794}
 --- !u!1 &1971014180
 GameObject:
   m_ObjectHideFlags: 0
@@ -3808,7 +3814,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1971014181}
   - component: {fileID: 1971014183}
-  - component: {fileID: 1971014182}
   m_Layer: 0
   m_Name: Enemy Manager
   m_TagString: Untagged
@@ -3831,22 +3836,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1046082860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1971014182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1971014180}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd0a971b9e4efb841a9ef4aa56676027, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  corner1: {fileID: 604855884}
-  corner2: {fileID: 1936558227}
-  enemyPrefab: {fileID: 392854982787144276, guid: 17c4a46e99b59304a8cfab8fa362d5a7, type: 3}
-  spawnRate: 1
 --- !u!114 &1971014183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3854,7 +3843,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1971014180}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd0a971b9e4efb841a9ef4aa56676027, type: 3}
   m_Name: 
