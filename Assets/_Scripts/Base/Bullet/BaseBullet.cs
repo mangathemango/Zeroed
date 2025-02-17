@@ -3,13 +3,19 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 
 /// <summary>
-///* Base bullet class for all bullets in the game
-///! This can't work standalone because there's no general damage dealing system in place yet
+///* Base bullet class for all bullets in the game<br/>
+///* Contains the basic properties of a bullet, such as damage, despawn time, etc.<br/><br/>
+///
+///? Currently, this still can't work standalone, as it needs to be inherited by a bullet class like ExplosionBullet or SingleBullet<br/>
 /// </summary>
-public abstract class BaseBullet: MonoBehaviour {
+public class BaseBullet: MonoBehaviour {
     public float damage = 0f;
+    public float despawnTime = 5;
+    public float despawnOnCollisionTime = 0.1f;
+    public bool stopAfterCollision = true;
     protected Rigidbody rb;
     protected SphereCollider sc;
+
 
 
     /// <summary>
@@ -26,12 +32,15 @@ public abstract class BaseBullet: MonoBehaviour {
         if (!sc) {
             sc = gameObject.AddComponent<SphereCollider>();
         }
+
+        Invoke("Destroy", despawnTime);
     }
 
     protected virtual void OnCollisionEnter(Collision collision) {
-        if (IsGameObjectAnEnemy(collision.gameObject, out BaseEnemy enemy)) {
-            DealSingleDamage(enemy, damage);
+        if (stopAfterCollision) {
+            StopBullet();
         }
+        Invoke("Destroy", despawnOnCollisionTime);  
     }
     
     protected bool IsGameObjectAnEnemy(GameObject go, out BaseEnemy enemy) {
