@@ -34,14 +34,14 @@ public class BaseBullet: MonoBehaviour {
             sc = gameObject.AddComponent<SphereCollider>();
         }
 
-        Invoke("Destroy", despawnTime);
+        Destroy(gameObject, despawnTime);
     }
 
     protected virtual void OnCollisionEnter(Collision collision) {
         if (stopAfterCollision) {
             StopBullet();
         }
-        Invoke("Destroy", despawnOnCollisionTime);  
+        Destroy(gameObject, despawnOnCollisionTime);
     }
     
     /// <summary>
@@ -90,13 +90,5 @@ public class BaseBullet: MonoBehaviour {
         rb.mass = 0;
         rb.useGravity = false;
         sc.enabled = false;
-    }
-
-    /// <summary>
-    /// * Destroy the bullet <br/><br/>
-    /// ? This goofy function is here because Unity doesn't allow you to call Destroy(gameObject) directly from a function that is called by Invoke<br/>
-    /// </summary>
-    protected void Destroy() {
-        Destroy(gameObject);
     }
 }
