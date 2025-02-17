@@ -34,18 +34,18 @@ public class PlayerInventory : MonoBehaviour
             currentWeapon = weaponSlots[targetIndex];
         }
 
-        weaponSlots[targetIndex ].SetActive(true);
+        weaponSlots[targetIndex].SetActive(true);
         currentIndex = targetIndex;
-        BaseGun gun = currentWeapon.GetComponent<BaseGun>();
-        if (gun != null) {
-            gun.playerTransform = transform;
-        }
     }
 
     private void InstantiateAllWeapons() {
         for (int i = 0; i < weaponSlots.Length; i++) {
             weaponSlots[i] = Instantiate(weaponSlots[i], transform.position, transform.rotation, transform);
             weaponSlots[i].SetActive(false);
+            BaseGun gun = weaponSlots[i].GetComponent<BaseGun>();
+            if (gun != null) {
+                gun.Initialize();
+            }
             rb.mass += weaponSlots[i].GetComponent<BaseGun>().mass;
         } 
     }
