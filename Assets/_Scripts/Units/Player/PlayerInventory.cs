@@ -3,25 +3,39 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    public GameObject weaponPrefab;
+    public GameObject[] weaponSlots = new GameObject[2];
     [NonSerialized] public GameObject currentWeapon;
+    
+    private int currentIndex = -1;
     private void Start()
     {
-        HoldWeapon();
+        InstantiateAllWeapons();
+        EquipWeapon(0);
     }
 
-    private void Update()
-    {
-        if (currentWeapon == null)
-        {
-            HoldWeapon();
+    public void EquipWeapon(int index) {
+        if (index < 0 || index >= weaponSlots.Length) {
+            return;
         }
-    }
-    void HoldWeapon() {
-        currentWeapon = Instantiate(weaponPrefab, transform.position, transform.rotation, transform);
+        if (currentIndex == index) {
+            return;
+        }
+        if (currentWeapon != null) {
+            currentWeapon.SetActive(false);
+        }
+        currentWeapon = weaponSlots[index];
+        currentWeapon.SetActive(true);
+        currentIndex = index;
         BaseGun gun = currentWeapon.GetComponent<BaseGun>();
         if (gun != null) {
             gun.playerTransform = transform;
+        }
+    }
+
+    private void InstantiateAllWeapons() {
+        for (int i = 0; i < weaponSlots.Length; i++) {
+            weaponSlots[i] = Instantiate(weaponSlots[i], transform.position, transform.rotation, transform);
+            weaponSlots[i].SetActive(false);
         }
     }
 }

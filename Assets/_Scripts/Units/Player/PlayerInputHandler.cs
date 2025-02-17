@@ -32,6 +32,12 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
         if (Input.GetKeyDown(KeyCode.V)) {
             gun.SwitchFireMode();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            playerInventory.EquipWeapon(0);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            playerInventory.EquipWeapon(1);
+        }
 
         // Player Controls
         movement.moveHorizontal = Input.GetAxisRaw("Horizontal");
