@@ -183,7 +183,7 @@ public abstract class BaseGun : MonoBehaviour
             HandleTriggerPressed();
         }
         if (aiming && !aimCoroutineRunning) {
-            StartCoroutine(Aim());
+            StartCoroutine(HandleAiming());
         }
     }
 
@@ -261,7 +261,7 @@ public abstract class BaseGun : MonoBehaviour
     ///
     /// TODO: The switch case for scopeMultiplier will be omitted after the Optics are replaced with ScriptableObjects
     /// </summary>
-    IEnumerator Aim() {
+    IEnumerator HandleAiming() {
         if (aimCoroutineRunning) {
             yield break;
         }
