@@ -63,9 +63,7 @@ public class UiUpdater: Singleton<UiUpdater> {
     }
 
     private void Update () {
-        if (currentWeapon == null) {
-            currentWeapon = playerInventory.currentWeapon;
-        }
+        currentWeapon = playerInventory.currentWeapon;
         if (currentWeapon.GetComponent<BaseGun>() != null) {
             currentGun = currentWeapon.GetComponent<BaseGun>();
         }
