@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
@@ -10,18 +11,19 @@ public class PlayerInventory : MonoBehaviour
     private void Start()
     {
         InstantiateAllWeapons();
-        EquipWeapon(0);
+        StartCoroutine(EquipWeapon(0));
     }
 
-    public void EquipWeapon(int index) {
+    public IEnumerator EquipWeapon(int index) {
         if (index < 0 || index >= weaponSlots.Length) {
-            return;
+            yield break;
         }
         if (currentIndex == index) {
-            return;
+            yield break;
         }
         if (currentWeapon != null) {
             currentWeapon.SetActive(false);
+            yield return new WaitForSeconds(currentWeapon.GetComponent<BaseGun>().switchTimeSeconds);
         }
         currentWeapon = weaponSlots[index];
         currentWeapon.SetActive(true);
