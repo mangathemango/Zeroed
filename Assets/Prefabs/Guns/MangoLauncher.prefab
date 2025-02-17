@@ -132,6 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd72c3ef06a94db408f6ca28ed4581c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  test: {fileID: 0}
   gunName: Mango Launcher
   ammoType: {fileID: 6661516185590720827, guid: c028ae1e7150b0f4d8e758263bd236e7, type: 3}
   ammoCapacity: 20

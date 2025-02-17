@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Optic", menuName = "Guns/Attachments/Optics")]
-public class OpticsData: ScriptableObject {
-    public string opticName;
+[CreateAssetMenu(fileName = "New Optics", menuName = "Guns/Attachments/Optics")]
+public class OpticsData: AttachmentConfig {
     public float scopeMultiplier;
+    public float adsTime;
 }
