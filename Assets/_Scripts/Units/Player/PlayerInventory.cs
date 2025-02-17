@@ -16,20 +16,26 @@ public class PlayerInventory : MonoBehaviour
         StartCoroutine(EquipWeapon(0));
     }
 
-    public IEnumerator EquipWeapon(int index) {
-        if (index < 0 || index >= weaponSlots.Length) {
+    public IEnumerator EquipWeapon(int targetIndex) {
+        if (targetIndex < 0 || targetIndex >= weaponSlots.Length) {
             yield break;
         }
-        if (currentIndex == index) {
+        if (currentIndex == targetIndex) {
             yield break;
         }
+        float switchTime = weaponSlots[targetIndex].GetComponent<BaseGun>().switchTimeSeconds;
+        
         if (currentWeapon != null) {
+            switchTime += currentWeapon.GetComponent<BaseGun>().switchTimeSeconds;
             currentWeapon.SetActive(false);
-            yield return new WaitForSeconds(currentWeapon.GetComponent<BaseGun>().switchTimeSeconds);
+            currentWeapon = weaponSlots[targetIndex];
+            yield return new WaitForSeconds(switchTime);
+        } else {
+            currentWeapon = weaponSlots[targetIndex];
         }
-        currentWeapon = weaponSlots[index];
-        currentWeapon.SetActive(true);
-        currentIndex = index;
+
+        weaponSlots[targetIndex ].SetActive(true);
+        currentIndex = targetIndex;
         BaseGun gun = currentWeapon.GetComponent<BaseGun>();
         if (gun != null) {
             gun.playerTransform = transform;
