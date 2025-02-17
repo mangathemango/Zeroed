@@ -6,10 +6,12 @@ public class PlayerInventory : MonoBehaviour
 {
     public GameObject[] weaponSlots = new GameObject[2];
     [NonSerialized] public GameObject currentWeapon;
+    private Rigidbody rb;
     
     private int currentIndex = -1;
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
         InstantiateAllWeapons();
         StartCoroutine(EquipWeapon(0));
     }
@@ -38,6 +40,7 @@ public class PlayerInventory : MonoBehaviour
         for (int i = 0; i < weaponSlots.Length; i++) {
             weaponSlots[i] = Instantiate(weaponSlots[i], transform.position, transform.rotation, transform);
             weaponSlots[i].SetActive(false);
-        }
+            rb.mass += weaponSlots[i].GetComponent<BaseGun>().mass;
+        } 
     }
 }
