@@ -24,7 +24,7 @@ public class UiUpdater: Singleton<UiUpdater> {
         if (playerInventory == null) {
             Debug.LogError("Player not found!");
         }
-        currentWeapon = playerInventory.currentWeapon;
+        currentWeapon = playerInventory.CurrentWeapon;
 
         string[] uiElementNames = { "Ammo Count UI", "Chamber UI", "Charge UI", "Fire Mode UI", "Gun Name UI", "Reloading UI" };
         foreach (string uiElementName in uiElementNames) {
@@ -63,7 +63,7 @@ public class UiUpdater: Singleton<UiUpdater> {
     }
 
     private void Update () {
-        currentWeapon = playerInventory.currentWeapon;
+        currentWeapon = playerInventory.CurrentWeapon;
         if (currentWeapon.GetComponent<BaseGun>() != null) {
             currentGun = currentWeapon.GetComponent<BaseGun>();
         }

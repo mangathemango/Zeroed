@@ -13,7 +13,7 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
     private void Update()
     {
         // Gun controls
-        gun = playerInventory.currentWeapon.GetComponent<BaseGun>();
+        gun = playerInventory.CurrentWeapon.GetComponent<BaseGun>();
         if (Input.GetMouseButtonDown(0)) {
             StartCoroutine(gun.PressTrigger());
         }
