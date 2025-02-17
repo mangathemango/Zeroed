@@ -129,6 +129,7 @@ public abstract class BaseGun : MonoBehaviour
     public AudioClip meleeHitSFX;
 
     [HideInInspector] public PlayerMovement playerMovement;
+    [HideInInspector] public Transform environment;
     [HideInInspector] public Transform playerTransform;
     [HideInInspector] public AudioSource audioSource;
     [HideInInspector] public FireMode currentFireMode;
@@ -159,6 +160,7 @@ public abstract class BaseGun : MonoBehaviour
         GameObject player = GameObject.Find("Player");
         playerTransform = player.transform;
         playerMovement = player.GetComponent<PlayerMovement>();
+        environment = GameObject.Find("Environment").transform;
 
         if (audioSource == null) {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -480,7 +482,7 @@ public abstract class BaseGun : MonoBehaviour
         }
         
         // Instantiate the bullet
-        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation);
+        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation, environment);
         bullet.GetComponent<Rigidbody>().linearVelocity = GetShootingDirection() * muzzleVelocity;
         bullet.GetComponent<BaseBullet>().damage = maxDamage;
 
