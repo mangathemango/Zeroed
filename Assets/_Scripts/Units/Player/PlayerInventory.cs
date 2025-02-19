@@ -8,57 +8,56 @@ using UnityEngine;
 /// </summary>
 public class PlayerInventory : MonoBehaviour
 {
-    public GameObject[] weaponSlots = new GameObject[2];
+    public GameObject[] weaponSlots = new GameObject[3];
     private Rigidbody rb;
     private int currentWeaponIndex = 0;
+    private float switchTimer = 0;
+    private int currentWeaponPathIndex = 0;
     public GameObject CurrentWeapon {
         get {return weaponSlots[currentWeaponIndex];}
+    }
+
+    private float CurrentWeaponSwitchTime {
+        get {return CurrentWeapon.GetComponent<BaseGun>().switchTimeSeconds;}
     }
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         InstantiateAllWeapons();
-        StartCoroutine(EquipWeapon(0));
+        EquipWeapon(0);
     }
 
-    /// <summary>
-    /// * Equip a weapon from the player's weapon slots<br/><br/>
-    /// ? Note: Switching weapons is delayed by the current weapon switch time AND the target weapon switch time<br/>
-    /// </summary>
-    /// <param name="targetWeaponIndex">The index of the weapon inside weaponSlots array</param>
-    public IEnumerator EquipWeapon(int targetWeaponIndex) {
-        // If the player has no current weapon, equip the target weapon immediately
-        if (CurrentWeapon.activeSelf == false) {
-            currentWeaponIndex = targetWeaponIndex;
-            CurrentWeapon.SetActive(true);
-            yield break;
-        } 
+    private void Update()
+    {
+        UpdateWeaponSwitching();
+    }
 
-        // Array bounds check
-        if (targetWeaponIndex < 0 || targetWeaponIndex >= weaponSlots.Length) {
-            yield break;
+    private void UpdateWeaponSwitching() {
+        if (currentWeaponPathIndex != currentWeaponIndex) {
+            switchTimer -= Time.deltaTime;
+            if (switchTimer <= 0) {
+                switchTimer = 0;
+                currentWeaponPathIndex = currentWeaponIndex;
+            }
         }
 
-        // If the player is already using the target weapon, do nothing
-        if (currentWeaponIndex == targetWeaponIndex) {
-            yield break;
+        if (currentWeaponPathIndex == currentWeaponIndex) {
+            if (switchTimer < CurrentWeaponSwitchTime) {
+                switchTimer += Time.deltaTime;
+            } 
+            if (switchTimer >= CurrentWeaponSwitchTime) {
+                CurrentWeapon.SetActive(true);
+            }
         }
-        
-        // Switch time is the sum of the current weapon's switch time and the target weapon's switch time
-        float switchTime = weaponSlots[targetWeaponIndex].GetComponent<BaseGun>().switchTimeSeconds +
-                           CurrentWeapon.GetComponent<BaseGun>().switchTimeSeconds;
+    }
 
-        // Disable current weapon
+    public void EquipWeapon(int weaponIndex) {
+        if (weaponIndex == currentWeaponIndex) {
+            return;
+        }
         CurrentWeapon.SetActive(false);
-
-        // Switch to target weapon
-        //? Note: The weapon is switched immediately, but the weapon can only be fired after [switch time] has passed
-        currentWeaponIndex = targetWeaponIndex;
-
-        yield return new WaitForSeconds(switchTime);
-        //! This set active thing may cause some scaling issues later, but it's fine for now
-        CurrentWeapon.SetActive(true);
+        currentWeaponIndex = weaponIndex;
     }
 
     /// <summary>

@@ -33,10 +33,10 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
             gun.SwitchFireMode();
         }
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            StartCoroutine(playerInventory.EquipWeapon(0));
+            playerInventory.EquipWeapon(0);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            StartCoroutine(playerInventory.EquipWeapon(1));
+            playerInventory.EquipWeapon(1);
         }
 
         // Player Controls
