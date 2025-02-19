@@ -30,7 +30,7 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
             gun.Melee();
         }
         if (Input.GetKeyDown(KeyCode.V)) {
-            gun.switchFireMode();
+            gun.SwitchFireMode();
         }
 
         // Player Controls

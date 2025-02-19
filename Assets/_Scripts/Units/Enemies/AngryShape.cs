@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : BaseEnemy
+public class AngryShape : BaseEnemy
 {
     public Transform player;
     private Rigidbody rb;

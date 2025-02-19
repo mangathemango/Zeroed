@@ -1,136 +1,174 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+///* Manages the crosshair/cursor<br/><br/>
+///
+///? As per current version, the crosshair's mobility is limitted by 2 invisible diagonal lines, forming a V shape <br/>
+///? from the player's position to both top corners of the screen. In this code, they're called "view diagonals".<br/>
+///? When the crosshair moves to either side of the view diagonals, the camera will rotate 45 degress on that way<br/><br/>
+///
+/// </summary>
 public class Crosshair : Singleton<Crosshair>
 {   
-    [Range(0f, 0.5f)]
-    [SerializeField] private float minSmoothTime = 0f;
+
     [Range(10f, 100f)]
     [SerializeField] private float sensitivity = 1f;
-    private Transform shotPlacement;
-    private Transform shotOrigin;
+    [SerializeField] private Transform crosshair;
 
-    public Transform placement {get {return shotPlacement;}}
-    public bool shooting = false;
-    private Vector3 velocity = Vector3.zero;
-    private float smoothTime;
+    private Transform playerTransform;
+
+    private float minY;
     private bool rotateCameraReady = true;
-    private Transform player;
-    [Range(1f, 10f)]
-    [SerializeField] private float stablizeRate = 2f;
+
     void Start()
     {
+        // Locks the cursor in the center of the screen
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        shotPlacement = GameObject.Find("Shot Placement UI").transform;
-        shotOrigin = GameObject.Find("Shot Origin UI").transform;
-        shotPlacement.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        shotOrigin.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-        smoothTime = minSmoothTime;
-        player = GameObject.Find("Player").transform;
+
+        // Getting references
+        crosshair.position = CameraManager.Instance.screenCenter;
+        playerTransform = GameObject.Find("Player").transform;
     }
     
-    float minY;
     void Update()
     {
         // Get mouse movement delta
         float mouseX = Input.GetAxis("Mouse X") * sensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
-        shotPlacement.position += new Vector3(mouseX, mouseY, 0);
-        ClampCrosshairOnViewDiagonals();
+        crosshair.position += new Vector3(mouseX, mouseY, 0);
+        ClampCrosshairOnViewDiagonals(out bool cursorIsOnViewDiagonals);
         
-        if (shotPlacement.position.normalized == new Vector3(shotPlacement.position.x,minY,0).normalized && rotateCameraReady) {
-            StartCoroutine(RotateCamera());
+        if (cursorIsOnViewDiagonals && rotateCameraReady) {
+            RotateCamera();
+            rotateCameraReady = false;
+            float followDuration = 0.5f;
+            StartCoroutine(FollowCrosshairWorldPoint(followDuration));
+            StartCoroutine(ResetCameraReady(followDuration));
         }
-
-        shotOrigin.position = shotPlacement.position;
 
     }
 
-    private void ClampCrosshairOnViewDiagonals() {
-        if (shotPlacement.position.x > Screen.width / 2) {
-            minY = shotOrigin.position.x * Screen.height / Screen.width;
-        } else {
-            minY = Screen.height - shotOrigin.position.x * Screen.height / Screen.width;
-        }
-        minY = minY - CameraManager.Instance.screenCenter.y + CameraManager.Instance.playerPositionOnScreen.y;
-        shotPlacement.position = new Vector3(
-            Mathf.Clamp(shotPlacement.position.x, 0  , Screen.width),
-            Mathf.Clamp(shotPlacement.position.y,Mathf.Clamp(minY, CameraManager.Instance.playerPositionOnScreen.y + 20, Screen.height), Screen.height),
+    /// <summary>
+    /// * Clamps the crosshair inside the view diagonals <br/><br/>
+    /// 
+    /// ? This is first done by calculating the minimum Y value the crosshair can have based on the X value. <br/>
+    /// ? This is done in the getMinY function. <br/><br/>
+    /// ? After that, the crosshair's position is clamped between the screen's edges and the minimum Y value. <br/>
+    /// </summary>
+    private void ClampCrosshairOnViewDiagonals(out bool cursorIsOnViewDiagonals) {
+        minY = GetMinY(crosshair.position.x);
+        crosshair.position = new Vector3(
+            Mathf.Clamp(crosshair.position.x, 0  , Screen.width),
+            Mathf.Clamp(crosshair.position.y,minY, Screen.height),
             0
         );
+        cursorIsOnViewDiagonals = (crosshair.position.y == minY) && (minY > (CameraManager.Instance.playerPositionOnScreen.y + 20));
     }
-    private IEnumerator RotateCamera() {
-        if (!rotateCameraReady) {
-            yield break;
+
+    /// <summary>
+    /// * Calculates the minimum Y value the crosshair can have based on the X value <br/><br/>
+    /// 
+    /// ! Trigger warning: Math. <br/><br/>
+    ///
+    /// ? First, let's consider a diagonal line from the bottom left corner of the screen to the top right corner of the screen. <br/>
+    /// ? The function of this line is: f1(x) = y = x * Screen.height / Screen.width.  <br/>
+    /// ? Similarly, let's consider the diagonal line from the top left corner to the bottom right corner <br/>
+    /// ? The function of this line is: f2(x) = y = Screen.height - x * Screen.height / Screen.width.<br/>
+    /// ? Therefore, to achieve our desired effect, we will use f1(x) if the crosshair is on the right half of the screen, <br/>
+    /// ? and then use the f2(x) if the crosshair is on the left half of the screen. <br/><br/>
+    /// 
+    /// ? However, we want the V shape to be centered on the player's position on screen, but f1(x) and f2(x) intersects on the screen's center<br/>
+    /// ? Therefore, we need to subtract minY by the distance between the player's position on screen and the screen center <br/><br/>
+    /// 
+    /// TODO: Right now, the view diagonals are dependent on the screen's resolution. Maybe change this to FOV next time?<br/>
+    /// </summary>
+    /// <param name="x">The x position of the crosshair</param>
+    /// <returns>The lowest y position the cursor can go</returns>
+    private float GetMinY(float x) {
+        if (x > Screen.width / 2) {
+            // Shot placement is on the right side of the screen
+            minY = crosshair.position.x * Screen.height / Screen.width;
+        } else {
+            // Shot placement is on the left side of the screen
+            minY = Screen.height - crosshair.position.x * Screen.height / Screen.width;
         }
-        rotateCameraReady = false;
-        Vector3 crosshairWorldpoint = ShotPlacementToRaycastHit().point;
-        Vector3 lastCrosshairScreenPoint = shotPlacement.position;
-        Vector3 lastPlayerPosition = player.position;
-        if (shotPlacement.position.x > Screen.width / 2) {
+        // Shift the center of the V shape to the player's position instead of the screen center
+        minY = minY - (CameraManager.Instance.screenCenter.y - CameraManager.Instance.playerPositionOnScreen.y);
+
+        // Limit the minimum Y value to the player's y position + 20 (crosshair going too close to the player bugs the game out)
+        minY = Mathf.Max(minY, CameraManager.Instance.playerPositionOnScreen.y + 20);
+
+        return minY;
+    }
+
+    private void RotateCamera() {
+        if (crosshair.position.x > Screen.width / 2) {
             CameraManager.Instance.RotateClockwise(45);
         } else {
             CameraManager.Instance.RotateCounterclockwise(45);
         }
-        float timeElapsed = 0;
-        while (timeElapsed < 0.3f) {
-            timeElapsed += Time.deltaTime;
-            Vector3 currentPlayerPosition = player.position;
-            crosshairWorldpoint += currentPlayerPosition - lastPlayerPosition;
+    }
+
+    private IEnumerator FollowCrosshairWorldPoint(float followTime) {
+        Vector3 crosshairWorldpoint = CrosshairToRaycastHit().point;
+        Vector3 lastCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
+        Vector3 lastPlayerPosition = playerTransform.position;
+
+        Vector3 PlayerPositionDelta() {
+            Vector3 currentPlayerPosition = playerTransform.position;
+            Vector3 delta = currentPlayerPosition - lastPlayerPosition;
             lastPlayerPosition = currentPlayerPosition;
+            return delta;
+        }
+        
+        Vector3 CrosshairScreenPointDelta() {
             Vector3 currentCrosshairScreenPoint = Camera.main.WorldToScreenPoint(crosshairWorldpoint);
-            shotPlacement.position += currentCrosshairScreenPoint - lastCrosshairScreenPoint;
+            Vector3 delta = currentCrosshairScreenPoint - lastCrosshairScreenPoint;
             lastCrosshairScreenPoint = currentCrosshairScreenPoint;
+            return delta;
+        }
+
+        float timeElapsed = 0;
+        while (timeElapsed < followTime) {
+            timeElapsed += Time.deltaTime;
+            crosshairWorldpoint += PlayerPositionDelta();
+            crosshair.position += CrosshairScreenPointDelta();
             yield return null;
         }
+    }
+
+    private IEnumerator ResetCameraReady(float time) {
+        yield return new WaitForSeconds(time);
         rotateCameraReady = true;
     }
-    public Vector3 GetPlacementDistanceFromCenter()
+
+    public Vector3 GetCrosshairDistanceFromCenter()
     {
         return new Vector3(
-            (shotPlacement.position.x - Screen.width / 2) / Screen.width,
-            (shotPlacement.position.y - Screen.height / 2) / Screen.height,
-            0
-        );
-    }
-    public Vector3 GetOriginDistanceFromCenter()
-    {
-        return new Vector3(
-            (shotOrigin.position.x - Screen.width / 2) / Screen.width,
-            (shotOrigin.position.y - Screen.height / 2) / Screen.height,
+            (crosshair.position.x - Screen.width / 2) / Screen.width,
+            (crosshair.position.y - Screen.height / 2) / Screen.height,
             0
         );
     }
 
-    public Ray ShotOriginToRay()
+    public Ray CrosshairToRay()
     {
-        return Camera.main.ScreenPointToRay(shotOrigin.position);
+        return Camera.main.ScreenPointToRay(crosshair.position);
     }
 
-    public Ray ShotPlacementToRay()
-    {
-        return Camera.main.ScreenPointToRay(shotPlacement.position);
-    }
 
-    public RaycastHit ShotOriginToRaycastHit()
+    public RaycastHit CrosshairToRaycastHit()
     {
         RaycastHit hit;
-        Physics.Raycast(ShotOriginToRay(), out hit);
-        return hit;
-    }
-
-    public RaycastHit ShotPlacementToRaycastHit()
-    {
-        RaycastHit hit;
-        Physics.Raycast(ShotPlacementToRay(), out hit);
+        Physics.Raycast(CrosshairToRay(), out hit);
         return hit;
     }
 
     public void Recoil(float recoilX, float recoilY)
     {
-        shotPlacement.position = new Vector3(shotPlacement.position.x, shotPlacement.position.y + recoilY, 0);
+        crosshair.position = new Vector3(crosshair.position.x, crosshair.position.y + recoilY, 0);
     }
 }
