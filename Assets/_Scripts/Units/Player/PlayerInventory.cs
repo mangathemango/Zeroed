@@ -9,18 +9,18 @@ using UnityEngine;
 public class PlayerInventory : MonoBehaviour
 {
     public GameObject[] weaponSlots = new GameObject[3];
-    private Rigidbody rb;
     private int currentWeaponIndex = 0;
+    private int currentWeaponHeldIndex = 0;
     private float switchTimer = 0;
-    private int currentWeaponPathIndex = 0;
     public GameObject CurrentWeapon {
         get {return weaponSlots[currentWeaponIndex];}
     }
-
     private float CurrentWeaponSwitchTime {
         get {return CurrentWeapon.GetComponent<BaseGun>().switchTimeSeconds;}
     }
+    private Rigidbody rb;
 
+    // Start is called before the first frame update
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -28,37 +28,81 @@ public class PlayerInventory : MonoBehaviour
         EquipWeapon(0);
     }
 
-    private void Update()
-    {
-        UpdateWeaponSwitching();
-    }
-
-    private void UpdateWeaponSwitching() {
-        if (currentWeaponPathIndex != currentWeaponIndex) {
-            switchTimer -= Time.deltaTime;
-            if (switchTimer <= 0) {
-                switchTimer = 0;
-                currentWeaponPathIndex = currentWeaponIndex;
-            }
-        }
-
-        if (currentWeaponPathIndex == currentWeaponIndex) {
-            if (switchTimer < CurrentWeaponSwitchTime) {
-                switchTimer += Time.deltaTime;
-            } 
-            if (switchTimer >= CurrentWeaponSwitchTime) {
-                CurrentWeapon.SetActive(true);
-            }
-        }
-    }
-
+    /// <summary>
+    /// * Equip a weapon from the player's inventory<br/><br/>
+    /// ? The delay between switching weapons is handled by the atrocity that is ActivateCurrentWeapon() down there<br/>
+    /// </summary>
+    /// <param name="weaponIndex">The index of the gun inside the weaponSlots[] array</param>
     public void EquipWeapon(int weaponIndex) {
         if (weaponIndex == currentWeaponIndex) {
             return;
         }
+
         CurrentWeapon.SetActive(false);
         currentWeaponIndex = weaponIndex;
     }
+
+    // Update is called once per frame
+    private void Update()
+    {
+        if (!CurrentWeapon.activeInHierarchy) {
+            ActivateCurrentWeapon();
+        }
+    }
+
+    /// <summary>
+    /// * Activates the current weapon<br/><br/>
+    /// ? This function is a state machine that handles the activation of the current weapon after being switched to.<br/>
+    /// ! Note that currentWeaponIndex is the index of the weapon that the player *wants* to switch to, <br/>
+    /// ! not the weapon that the player is currently holding. <br/>
+    /// ! When switching between weapons, the value of currentWeaponIndex is changed immediately. <br/>
+    /// ! However, the actual gun GameObject (aka CurrentWeapon) is only activated after a certain delay.<br/><br/>
+    /// 
+    /// ? An example: We call EquipWeapon(1) to switch from gun 0 (index 0) to gun 1 (index 1).<br/>
+    /// ? This means that currentWeaponHeldIndex = 0, currentWeaponIndex = 1, and CurrentWeapon is inactive.
+    /// ? There are 3 states that we will go through:<br/>
+    /// ?   1. Player is holding gun 0   (currentWeaponHeldIndex != currentWeaponIndex, which procs HandleWeaponSwitch())<br/>
+    /// ?   2. Gun 0 is put away         (HandleWeaponSwitch() turns currentWeaponHeldIndex to 1, which procs HandleWeaponActivation())<br/>
+    /// ?   3. Player takes out gun 1    (HandleWeaponActivation() sets CurrentWeapon to active)<br/>
+    /// </summary>
+    private void ActivateCurrentWeapon() {
+        if (currentWeaponHeldIndex != currentWeaponIndex) {
+            HandleWeaponSwitch();
+        } else {
+            HandleWeaponActivation();
+        }
+    }
+
+    /// <summary>
+    /// * Handles the weapon switch, used by the function ActivateCurrentWeapon()<br/><br/>
+    /// ? This function sets currentWeaponHeldIndex to currentWeaponIndex after a certain delay of [switchTimer]<br/>
+    /// ? The reason why the [switchTimer] variable is used instead of WaitForSeconds() is too complicated to be explained with words.<br/>
+    /// ? Just read HandleWeaponActivation() and try to figure it out yourself<br/>
+    /// </summary>
+    private void HandleWeaponSwitch() {
+        if (switchTimer > 0) {
+            switchTimer -= Time.deltaTime;
+        } else {
+            switchTimer = 0;
+            currentWeaponHeldIndex = currentWeaponIndex;
+        }
+    }
+
+    /// <summary>
+    /// * Handles the current weapon activation, used by the function ActivateCurrentWeapon()<br/><br/>
+    /// ? This function sets the current weapon to active after a certain delay of [CurrentWeaponSwitchTime]<br/>
+    /// ? At the same time, it's also setting the variable [switchTimer] to the time that has been waited so far.<br/>
+    /// ? If you're still confused after allat, just contact Mango. I'll explain it with illustrations<br/>
+    /// </summary>
+    private void HandleWeaponActivation() {
+        if (switchTimer < CurrentWeaponSwitchTime) {
+            switchTimer += Time.deltaTime;
+        } else {
+            switchTimer = CurrentWeaponSwitchTime;
+            CurrentWeapon.SetActive(true);
+        }
+    }
+
 
     /// <summary>
     /// * Instantiate all weapons in the player's weapon slots<br/><br/>
