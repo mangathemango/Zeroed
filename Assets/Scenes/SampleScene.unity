@@ -2690,7 +2690,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e58702c9514b884e8f1326d47eda1e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 2071962651439539118, guid: a2be9728cf5a37d4283b2745059bfa53, type: 3}
+  weaponSlots:
+  - {fileID: 1776013771887272641, guid: d1a8b40870cc0314ea85966eae14661c, type: 3}
+  - {fileID: 2071962651439539118, guid: a2be9728cf5a37d4283b2745059bfa53, type: 3}
 --- !u!1 &1646230960
 GameObject:
   m_ObjectHideFlags: 0

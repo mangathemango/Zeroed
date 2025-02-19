@@ -156,6 +156,10 @@ public abstract class BaseGun : MonoBehaviour
     /// </summary>
     protected virtual void Start()
     {
+        Initialize();
+    }
+
+    public void Initialize () {
         // Setup References
         GameObject player = GameObject.Find("Player");
         playerTransform = player.transform;

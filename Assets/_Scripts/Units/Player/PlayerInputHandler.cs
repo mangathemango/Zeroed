@@ -13,7 +13,7 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
     private void Update()
     {
         // Gun controls
-        gun = playerInventory.currentWeapon.GetComponent<BaseGun>();
+        gun = playerInventory.CurrentWeapon.GetComponent<BaseGun>();
         if (Input.GetMouseButtonDown(0)) {
             StartCoroutine(gun.PressTrigger());
         }
@@ -31,6 +31,15 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
         }
         if (Input.GetKeyDown(KeyCode.V)) {
             gun.SwitchFireMode();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            playerInventory.EquipWeapon(0);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            playerInventory.EquipWeapon(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            playerInventory.EquipWeapon(2);
         }
 
         // Player Controls
