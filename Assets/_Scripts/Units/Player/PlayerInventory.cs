@@ -34,6 +34,10 @@ public class PlayerInventory : MonoBehaviour
     /// </summary>
     /// <param name="weaponIndex">The index of the gun inside the weaponSlots[] array</param>
     public void EquipWeapon(int weaponIndex) {
+        if (weaponSlots[weaponIndex] == null) {
+            return;
+        }
+        
         if (weaponIndex == currentWeaponIndex) {
             return;
         }

@@ -38,6 +38,9 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
             playerInventory.EquipWeapon(1);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            playerInventory.EquipWeapon(2);
+        }
 
         // Player Controls
         movement.moveHorizontal = Input.GetAxisRaw("Horizontal");
