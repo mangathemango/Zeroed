@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Unity
-      uses: game-ci/unity-setup@v2
+      uses: game-ci/unity-setup@v4
       with:
         unityVersion: 6000.0.37f1
 
@@ -25,7 +25,7 @@ jobs:
         unity -projectPath . -buildTarget StandaloneWindows64 -quit -batchmode -nographics -buildPath build/StandaloneWindows64
 
     - name: Upload build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: StandaloneWindows64
         path: build/StandaloneWindows64
