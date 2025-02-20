@@ -166,9 +166,20 @@ public class Crosshair : Singleton<Crosshair>
         Physics.Raycast(CrosshairToRay(), out hit);
         return hit;
     }
+    
+    public float DistanceToPlayerPosition() {
+        Vector3 playerPosition = Camera.main.WorldToScreenPoint(playerTransform.position);
+        return (crosshair.position - playerPosition).magnitude;
+    }
+
+    private float screenDiagonalLength {
+        get{return new Vector3(Screen.width, Screen.height, 0).magnitude;}
+    }
 
     public void Recoil(float recoilX, float recoilY)
     {
-        crosshair.position = new Vector3(crosshair.position.x, crosshair.position.y + recoilY, 0);
+        float transformedRecoilY = recoilY * ( DistanceToPlayerPosition() / (screenDiagonalLength / 4));
+        Debug.Log($"{recoilY} => {transformedRecoilY}");
+        crosshair.position = new Vector3(crosshair.position.x, crosshair.position.y + transformedRecoilY, 0);
     }
 }
