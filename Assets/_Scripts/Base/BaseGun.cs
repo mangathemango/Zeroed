@@ -139,6 +139,7 @@ public abstract class BaseGun : MonoBehaviour
     [HideInInspector] public bool burstFireReady = true;
     [HideInInspector] public int currentAmmoInMag;
     [HideInInspector] public int currentAmmoInChamber;
+    [HideInInspector] private bool initialized = false;
 
     //* Coroutines
     //* Trigger Press
@@ -391,6 +392,9 @@ public abstract class BaseGun : MonoBehaviour
     }
 
     public void Initialize () {
+        if (initialized) {
+            return;
+        }
         // Setup References
         if (!playerTransform || !playerMovement || !environment) {
             GameObject player = GameObject.Find("Player");
@@ -409,6 +413,8 @@ public abstract class BaseGun : MonoBehaviour
         currentAmmoInMag = ammoCapacity - 1;
         currentAmmoInChamber = 1;
         SetupFireModes();
+
+        initialized = true;
     }
 
 
@@ -423,13 +429,23 @@ public abstract class BaseGun : MonoBehaviour
 
     public void Disable() {
         gameObject.SetActive(false);
-        StopAllCoroutines();
+        StopAllGunCoroutines();
     }
 
     public void Enable() {
         gameObject.SetActive(true);
     }
-    
+
+    private void StopAllGunCoroutines() {
+        StopAllCoroutines();
+        triggerPressCoroutine = null;
+        triggerPressTransitioningCoroutine = null;
+        aimDownSightCoroutine = null;
+        aimDownSightTransitioningCoroutine = null;
+        reloadCoroutine = null;
+        chargeCoroutine = null;
+    }
+
     /// <summary>
     ///* Rotates the gun to look at the cursor<br/>
     ///? This function is paired with RotateAroundPlayer() to make the gun look at the cursor<br/>
