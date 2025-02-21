@@ -1,0 +1,38 @@
+name: Update Issue Label Based on Kanban Board Column
+
+on:
+  project_card:
+    types: [moved]
+
+jobs:
+  update-label:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Update issue label based on Kanban board column
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const columnIdToLabelMap = {
+            'f75ad846': 'status: not ready',
+            '87654321': 'In progress',
+            '11223344': 'Done'
+          };
+
+          const columnId = context.payload.project_card.column_id;
+          const issueUrl = context.payload.project_card.content_url;
+
+          if (issueUrl && columnIdToLabelMap[columnId]) {
+            const label = columnIdToLabelMap[columnId];
+            const issueNumber = issueUrl.split('/').pop();
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+
+            await github.issues.addLabels({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              labels: [label]
+            });
+
+            console.log(`Added label "${label}" to issue #${issueNumber}`);
+          }
