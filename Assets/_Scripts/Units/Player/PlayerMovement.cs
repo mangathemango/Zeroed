@@ -1,6 +1,9 @@
 using System.Collections;
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor.Callbacks;
+#endif
 
 public class PlayerMovement : MonoBehaviour
 {
