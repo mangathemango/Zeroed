@@ -150,6 +150,41 @@ public abstract class BaseGun : MonoBehaviour
     private bool pressTriggerCoroutineRunning = false;
     private int burstShotsFired = 0;
 
+    // Coroutines
+    private Coroutine pressTriggerCoroutine;
+    private Coroutine aimDownSightCoroutine;
+    private Coroutine reloadCoroutine;
+    private Coroutine chargeCoroutine;
+
+
+    public void Reload() {
+        if (reloadCoroutine != null) {
+            return;
+        }
+        reloadCoroutine = StartCoroutine(ReloadCoroutine());
+    }
+
+    public void Charge() {
+        if (chargeCoroutine != null) {
+            return;
+        }
+        chargeCoroutine = StartCoroutine(ChargeCoroutine());
+    }
+
+    public void PressTrigger() {
+        if (pressTriggerCoroutine != null) {
+            return;
+        }
+        pressTriggerCoroutine = StartCoroutine(PressTriggerCoroutine());
+    }
+
+    public void AimDownSight() {
+        if (aimDownSightCoroutine != null) {
+            return;
+        }
+        aimDownSightCoroutine = StartCoroutine(AimDownSightCoroutine());
+    }
+
     /// <summary>
     ///* The start function for baseGun is used to setup references (such as playerPosition and playerMovement)<br/>
     ///* And to setup the default fire mode and ammo in the mag and chamber<br/>
@@ -185,12 +220,10 @@ public abstract class BaseGun : MonoBehaviour
     {   
         LookAtCursor();
         RotateAroundPlayer();
-        if (triggerPressed) {
-            HandleTriggerPressed();
-        }
-        if (aiming && !aimCoroutineRunning) {
-            StartCoroutine(HandleAiming());
-        }
+    }
+
+    public void Disable() {
+
     }
 
 
@@ -229,7 +262,7 @@ public abstract class BaseGun : MonoBehaviour
     /// 
     ///! Correct me if I'm wrong I'm not a gun person but the idea is there
     /// </summary>
-    public virtual IEnumerator Reload() {
+    public virtual IEnumerator ReloadCoroutine() {
         bool magazineIsFull = currentAmmoInMag >= ammoCapacity;
         bool chamberIsFull = currentAmmoInChamber >= chamberCapacity;
         bool gunUsesMagazines = ammoCapacity > 0;
@@ -255,6 +288,7 @@ public abstract class BaseGun : MonoBehaviour
             currentAmmoInChamber = chamberCapacity;
         }
         reloading = false;
+        reloadCoroutine = null;
     }
 
     /// <summary>
@@ -267,7 +301,7 @@ public abstract class BaseGun : MonoBehaviour
     ///
     /// TODO: The switch case for scopeMultiplier will be omitted after the Optics are replaced with ScriptableObjects
     /// </summary>
-    IEnumerator HandleAiming() {
+    IEnumerator AimingCoroutine() {
         if (aimCoroutineRunning) {
             yield break;
         }
@@ -305,7 +339,7 @@ public abstract class BaseGun : MonoBehaviour
     ///* Puts one bullet from mag into chamber, if the chamber is not full already<br/>
     /// TODO: Maybe handle the case where the gun doesn't use magazines as well
     /// </summary>
-    public IEnumerator Charge() {
+    public IEnumerator ChargeCoroutine() {
         if (currentAmmoInMag < 1 || charging || currentAmmoInChamber >= chamberCapacity) {
             yield break;
         }
@@ -316,6 +350,7 @@ public abstract class BaseGun : MonoBehaviour
         currentAmmoInMag -= 1;
         currentAmmoInChamber += 1;
         charging = false;
+        chargeCoroutine = null;
     }
 
 
@@ -367,30 +402,26 @@ public abstract class BaseGun : MonoBehaviour
     /// * Presses the trigger of the gun<br/>
     /// TODO: Generalize this function to work not only with left mouse button press<br/>
     /// </summary>
-    public IEnumerator PressTrigger() {
-        if (pressTriggerCoroutineRunning) {
-            yield break;
-        }
-        pressTriggerCoroutineRunning = true;
+    public IEnumerator PressTriggerCoroutine() {
         audioSource.PlayOneShot(disconnectorSFX, soundSignature);
         if (currentAmmoInChamber <= 0) {
             audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
         }
 
         yield return new WaitForSeconds(triggerPullTimeSeconds);
-        if (Input.GetMouseButton(0)) {
-            triggerPressed = true;
-        }        
-        yield return new WaitUntil(() => !Input.GetMouseButton(0));
+        while (Input.GetMouseButton(0)) {
+            HandleTriggerPressed();
+            yield return null;
+        }
         triggerPressed = false;
-        pressTriggerCoroutineRunning = false;
+        pressTriggerCoroutine = null;
     }
 
     /// <summary>
     /// * Aims down the sight<br/>
     /// TODO: Generalize this function to work not only with right mouse button press<br/>
     /// </summary>
-    public IEnumerator AimDownSight() {
+    public IEnumerator AimDownSightCoroutine() {
         if (adsTimeSeconds > 0) {
             yield return new WaitForSeconds(adsTimeSeconds);
         }
@@ -399,6 +430,7 @@ public abstract class BaseGun : MonoBehaviour
         }
         yield return new WaitUntil(() => !Input.GetMouseButton(1));
         aiming = false;
+        aimDownSightCoroutine = null;
     }
 
     /// <summary>
