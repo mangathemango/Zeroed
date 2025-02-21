@@ -2,9 +2,9 @@ name: Unity CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ experiment/github-actions ]
   pull_request:
-    branches: [ main ]
+    branches: [ experiment/github-actions ]
 
 jobs:
   build:
