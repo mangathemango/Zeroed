@@ -139,50 +139,246 @@ public abstract class BaseGun : MonoBehaviour
     [HideInInspector] public bool burstFireReady = true;
     [HideInInspector] public int currentAmmoInMag;
     [HideInInspector] public int currentAmmoInChamber;
-    [HideInInspector] public bool triggerPressed = false;
-    [HideInInspector] public bool charging = false;
-    [HideInInspector] public bool reloading = false;
-    [HideInInspector] public bool aiming = false;
+
+    //* Coroutines
+    //* Trigger Press
+    private Coroutine triggerPressTransitioningCoroutine;
+    private Coroutine triggerPressCoroutine;
+
+    /// <summary>
+    ///* Returns true whenever there's a trigger press coroutine running
+    /// </summary>
+    public bool triggerPressed {
+        get {return triggerPressCoroutine != null;}
+    }
 
 
-    [Header("Internal")]
-    private bool aimCoroutineRunning = false;
-    private bool pressTriggerCoroutineRunning = false;
-    private int burstShotsFired = 0;
-
-    // Coroutines
-    private Coroutine pressTriggerCoroutine;
+    //* Aim Down Sight
+    private Coroutine aimDownSightTransitioningCoroutine;
     private Coroutine aimDownSightCoroutine;
+
+    /// <summary>
+    /// * Returns true whenever there's an aim down sight coroutine running
+    /// </summary>
+    public bool aiming {
+        get {return aimDownSightCoroutine != null;}
+    }
+
+    //* Reload
     private Coroutine reloadCoroutine;
+
+    /// <summary>
+    /// * Returns true whenever there's a reload coroutine running
+    /// </summary>
+    public bool reloading {
+        get {return reloadCoroutine != null;}
+    }
+    
+    //* Charge
     private Coroutine chargeCoroutine;
+
+    /// <summary>
+    /// * Returns true whenever there's a charge coroutine running
+    /// </summary>
+    public bool charging {
+        get {return chargeCoroutine != null;}
+    }
 
 
     public void Reload() {
-        if (reloadCoroutine != null) {
-            return;
+        if (reloadCoroutine == null) {
+            reloadCoroutine = StartCoroutine(ReloadCoroutine());
         }
-        reloadCoroutine = StartCoroutine(ReloadCoroutine());
+
+        /// <summary>
+        ///* Reloads the gun <br/><br/>
+        /// 
+        ///? The reloading behavior is different depending on whether the gun uses magazines or not<br/>
+        ///? (if ammoCapacity == 0, the gun doesn't use magazines)<br/><br/>
+        ///
+        ///? - If the gun uses magazines, this function will fill up the magazine if it's not already full<br/>
+        ///? - If the gun doesn't use magazines, this function will fill up the chamber instead, if it's not already full<br/><br/>
+        /// </summary>
+        IEnumerator ReloadCoroutine() {
+            bool magazineIsFull = currentAmmoInMag >= ammoCapacity;
+            bool chamberIsFull = currentAmmoInChamber >= chamberCapacity;
+            bool gunUsesMagazines = ammoCapacity > 0;
+
+            if (gunUsesMagazines && magazineIsFull) {
+                reloadCoroutine = null;
+                yield break;
+            }
+            if (!gunUsesMagazines && chamberIsFull) {
+                reloadCoroutine = null;
+                yield break;
+            }
+
+            audioSource.PlayOneShot(reloadSFX, soundSignature / 3);
+
+            currentAmmoInMag = 0;
+            yield return new WaitForSeconds(reloadTimeSeconds);
+            if (gunUsesMagazines) {
+                currentAmmoInMag = ammoCapacity;
+            } else {
+                currentAmmoInChamber = chamberCapacity;
+            }
+            reloadCoroutine = null;
+        }           
     }
 
     public void Charge() {
-        if (chargeCoroutine != null) {
-            return;
+        if (chargeCoroutine == null) {
+            chargeCoroutine = StartCoroutine(ChargeCoroutine());
         }
-        chargeCoroutine = StartCoroutine(ChargeCoroutine());
+
+        /// <summary>
+        ///* Puts one bullet from mag into chamber, if the chamber is not full already<br/>
+        /// </summary>
+        IEnumerator ChargeCoroutine() {
+            if (currentAmmoInMag <= 0 || currentAmmoInChamber >= chamberCapacity) {
+                chargeCoroutine = null;
+                yield break;
+            }
+
+            audioSource.PlayOneShot(chargeSFX, soundSignature / 2);
+
+            yield return new WaitForSeconds(chargingTime);
+            currentAmmoInMag -= 1;
+            currentAmmoInChamber += 1;
+            chargeCoroutine = null;
+        }
     }
 
     public void PressTrigger() {
-        if (pressTriggerCoroutine != null) {
-            return;
+        if (triggerPressTransitioningCoroutine == null) {
+            triggerPressTransitioningCoroutine = StartCoroutine(TriggerPressTransitioning());
         }
-        pressTriggerCoroutine = StartCoroutine(PressTriggerCoroutine());
+
+        /// <summary>
+        /// * Presses the trigger of the gun<br/>
+        /// TODO: Generalize this function to work not only with left mouse button press<br/>
+        /// </summary>
+        IEnumerator TriggerPressTransitioning() {
+            audioSource.PlayOneShot(disconnectorSFX, soundSignature);
+            if (currentAmmoInChamber <= 0) {
+                audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
+            }
+
+            yield return new WaitForSeconds(triggerPullTimeSeconds);
+            triggerPressCoroutine = StartCoroutine(TriggerPressCoroutine());
+            yield return new WaitUntil(() => !Input.GetMouseButton(0));
+            
+            triggerPressTransitioningCoroutine = null;
+        }
+
+        IEnumerator TriggerPressCoroutine() {
+            while (Input.GetMouseButton(0)) {
+                HandleTriggerPressed();
+                yield return null;
+            }
+            triggerPressCoroutine = null;
+        }
+        
+        /// <summary>
+        /// * Handles when the trigger is pressed. This function is called every frame where [triggerPressed] is true<br/><br/>
+        /// 
+        /// ? Since this function calls every frame, it's important to set fireReady to false right after the shot is fired.<br/>
+        /// ? Otherwise, the gun will keep firing every single frame until the trigger is released.<br/>
+        /// </summary>
+        void HandleTriggerPressed() {
+            if (currentAmmoInChamber <= 0) {
+                return;
+            }
+            if (currentFireMode == FireMode.Semi && semiFireReady) {
+                Fire();
+                semiFireReady = false;
+                StartCoroutine(ResetSemiFireReady());
+
+                IEnumerator ResetSemiFireReady() {
+                    yield return new WaitUntil(() => !triggerPressed);
+                    semiFireReady = true;
+                }
+            }
+            if (currentFireMode == FireMode.Auto && autoFireReady) {
+                Fire();
+                autoFireReady = false;
+                StartCoroutine(ResetAutoFireReady());
+
+                IEnumerator ResetAutoFireReady() {
+                    yield return new WaitForSeconds(60 / shotsPerMinute);
+                    autoFireReady = true;
+                }
+            }
+            if (currentFireMode == FireMode.Burst && burstFireReady) {
+                StartCoroutine(BurstFire());
+                burstFireReady = false;
+
+                IEnumerator BurstFire() {
+                    for (int i = 0; i < burstSize && currentAmmoInChamber > 0; i++) {
+                        Fire();
+                        yield return new WaitForSeconds(60 / burstRate);
+                    }
+                    burstFireReady = true;
+                }
+            }
+        }
     }
 
     public void AimDownSight() {
-        if (aimDownSightCoroutine != null) {
-            return;
+        if (aimDownSightTransitioningCoroutine == null) {
+            aimDownSightTransitioningCoroutine = StartCoroutine(AimDownSightTransitioning());
         }
-        aimDownSightCoroutine = StartCoroutine(AimDownSightCoroutine());
+        
+        /// <summary>
+        /// * Aims down the sight<br/>
+        /// TODO: Generalize this function to work not only with right mouse button press<br/>
+        /// </summary>
+        IEnumerator AimDownSightTransitioning() {
+            yield return new WaitForSeconds(adsTimeSeconds);
+
+            aimDownSightCoroutine = StartCoroutine(AimDownSightCoroutine());
+            
+            yield return new WaitUntil(() => !Input.GetMouseButton(1));
+            aimDownSightTransitioningCoroutine = null;
+        }
+
+        /// <summary>
+        ///* Handles when the player aims down the sight<br/><br/>
+        ///
+        ///? This function basically moves the camera further away from the player in order to inspect the environment.<br/>
+        ///? How much the camera is moved away from the player is calculated by: <br/>
+        ///? The cursor's distance from the center of the screen * the scope multiplier<br/>
+        ///? Details on how exactly the camera shifts from the player is in the CameraManager script<br/>
+        ///
+        /// TODO: The switch case for scopeMultiplier will be omitted after the Optics are replaced with ScriptableObjects
+        /// </summary>
+        IEnumerator AimDownSightCoroutine() {
+            float scopeMultiplier;
+            switch (Optics) {
+                case OpticType.x1:
+                    scopeMultiplier = 1.0f;
+                    break;
+                case OpticType.x2:
+                    scopeMultiplier = 2.0f;
+                    break;
+                case OpticType.x3:
+                    scopeMultiplier = 3.0f;
+                    break;
+                case OpticType.x4:
+                    scopeMultiplier = 4.0f;
+                    break;
+                default:
+                    scopeMultiplier = 1.0f;
+                    break;
+            }
+            while (aiming) {
+                Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
+                CameraManager.Instance.playerOffset = aimOffset * 10;
+                yield return null;
+            }
+            CameraManager.Instance.playerOffset = Vector3.zero;
+            aimDownSightCoroutine = null;
+        }
     }
 
     /// <summary>
@@ -196,10 +392,13 @@ public abstract class BaseGun : MonoBehaviour
 
     public void Initialize () {
         // Setup References
-        GameObject player = GameObject.Find("Player");
-        playerTransform = player.transform;
-        playerMovement = player.GetComponent<PlayerMovement>();
-        environment = GameObject.Find("Environment").transform;
+        if (!playerTransform || !playerMovement || !environment) {
+            GameObject player = GameObject.Find("Player");
+            playerTransform = player.transform;
+            playerMovement = player.GetComponent<PlayerMovement>();
+            environment = GameObject.Find("Environment").transform;
+        }
+
 
         if (audioSource == null) {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -223,10 +422,14 @@ public abstract class BaseGun : MonoBehaviour
     }
 
     public void Disable() {
-
+        gameObject.SetActive(false);
+        StopAllCoroutines();
     }
 
-
+    public void Enable() {
+        gameObject.SetActive(true);
+    }
+    
     /// <summary>
     ///* Rotates the gun to look at the cursor<br/>
     ///? This function is paired with RotateAroundPlayer() to make the gun look at the cursor<br/>
@@ -250,108 +453,6 @@ public abstract class BaseGun : MonoBehaviour
         transform.position = playerTransform.position + (transform.rotation * Vector3.forward);
     }
 
-
-    /// <summary>
-    ///* Reloads the gun <br/><br/>
-    /// 
-    ///? The reloading behavior is different depending on whether the<br/>
-    ///? gun uses magazines or not (if ammoCapacity == 0, the gun doesn't use magazines)<br/><br/>
-    ///
-    ///? - If the gun uses magazines, this function will fill up the magazine if it's not already full<br/>
-    ///? - If the gun doesn't use magazines, this function will fill up the chamber instead, if it's not already full<br/><br/>
-    /// 
-    ///! Correct me if I'm wrong I'm not a gun person but the idea is there
-    /// </summary>
-    public virtual IEnumerator ReloadCoroutine() {
-        bool magazineIsFull = currentAmmoInMag >= ammoCapacity;
-        bool chamberIsFull = currentAmmoInChamber >= chamberCapacity;
-        bool gunUsesMagazines = ammoCapacity > 0;
-
-        if (reloading) {
-            yield break;
-        }
-        if (gunUsesMagazines && magazineIsFull) {
-            yield break;
-        }
-        if (!gunUsesMagazines && chamberIsFull) {
-            yield break;
-        }
-
-        audioSource.PlayOneShot(reloadSFX, soundSignature / 3);
-
-        currentAmmoInMag = 0;
-        reloading = true;
-        yield return new WaitForSeconds(reloadTimeSeconds);
-        if (gunUsesMagazines) {
-            currentAmmoInMag = ammoCapacity;
-        } else {
-            currentAmmoInChamber = chamberCapacity;
-        }
-        reloading = false;
-        reloadCoroutine = null;
-    }
-
-    /// <summary>
-    ///* Handles when the player aims down the sight<br/><br/>
-    ///
-    ///? This function basically moves the camera further away from the player in order to inspect the environment.<br/>
-    ///? How much the camera is moved away from the player is calculated by: <br/>
-    ///? The cursor's distance from the center of the screen * the scope multiplier<br/>
-    ///? Details on how exactly the camera shifts from the player is in the CameraManager script<br/>
-    ///
-    /// TODO: The switch case for scopeMultiplier will be omitted after the Optics are replaced with ScriptableObjects
-    /// </summary>
-    IEnumerator AimingCoroutine() {
-        if (aimCoroutineRunning) {
-            yield break;
-        }
-        aimCoroutineRunning = true;
-        float scopeMultiplier;
-        switch (Optics) {
-            case OpticType.x1:
-                scopeMultiplier = 1.0f;
-                break;
-            case OpticType.x2:
-                scopeMultiplier = 2.0f;
-                break;
-            case OpticType.x3:
-                scopeMultiplier = 3.0f;
-                break;
-            case OpticType.x4:
-                scopeMultiplier = 4.0f;
-                break;
-            default:
-                scopeMultiplier = 1.0f;
-                break;
-        }
-        CameraManager cameraManager = CameraManager.Instance.GetComponent<CameraManager>();
-        while (aiming) {
-            Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
-            cameraManager.playerOffset = aimOffset * 10;
-            yield return null;
-        }
-        cameraManager.playerOffset = Vector3.zero;
-        aimCoroutineRunning = false;
-    }
-
-
-    /// <summary>
-    ///* Puts one bullet from mag into chamber, if the chamber is not full already<br/>
-    /// TODO: Maybe handle the case where the gun doesn't use magazines as well
-    /// </summary>
-    public IEnumerator ChargeCoroutine() {
-        if (currentAmmoInMag < 1 || charging || currentAmmoInChamber >= chamberCapacity) {
-            yield break;
-        }
-        audioSource.PlayOneShot(chargeSFX, soundSignature / 2);
-        charging = true;
-
-        yield return new WaitForSeconds(chargingTime);
-        currentAmmoInMag -= 1;
-        currentAmmoInChamber += 1;
-        charging = false;
-        chargeCoroutine = null;
-    }
 
 
     /// <summary>
@@ -385,123 +486,13 @@ public abstract class BaseGun : MonoBehaviour
         } else {
             audioSource.PlayOneShot(meleeMissSFX, soundSignature / 2);  
         }
-    }
 
-
-    /// <summary>
-    /// * Resets meleeReady based on switchTime<br/>
-    /// ! (I though switch time is supposed to be for switching between weapons, but I ain't the mechanics designer so don't blame me)<br/>
-    /// </summary>
-    IEnumerator ResetMelee() {
-        yield return new WaitForSeconds(switchTimeSeconds);
-        meleeReady = true;
-    }
-
-
-    /// <summary>
-    /// * Presses the trigger of the gun<br/>
-    /// TODO: Generalize this function to work not only with left mouse button press<br/>
-    /// </summary>
-    public IEnumerator PressTriggerCoroutine() {
-        audioSource.PlayOneShot(disconnectorSFX, soundSignature);
-        if (currentAmmoInChamber <= 0) {
-            audioSource.PlayOneShot(deadTriggerSFX, soundSignature / 3);
-        }
-
-        yield return new WaitForSeconds(triggerPullTimeSeconds);
-        while (Input.GetMouseButton(0)) {
-            HandleTriggerPressed();
-            yield return null;
-        }
-        triggerPressed = false;
-        pressTriggerCoroutine = null;
-    }
-
-    /// <summary>
-    /// * Aims down the sight<br/>
-    /// TODO: Generalize this function to work not only with right mouse button press<br/>
-    /// </summary>
-    public IEnumerator AimDownSightCoroutine() {
-        if (adsTimeSeconds > 0) {
-            yield return new WaitForSeconds(adsTimeSeconds);
-        }
-        if (Input.GetMouseButton(1)) {
-            aiming = true;
-        }
-        yield return new WaitUntil(() => !Input.GetMouseButton(1));
-        aiming = false;
-        aimDownSightCoroutine = null;
-    }
-
-    /// <summary>
-    /// * Resets auto fire ready<br/>
-    /// ? This is based on the shotsPerMinute variable<br/>
-    /// </summary>
-    private IEnumerator ResetAutoFireReady() {
-        yield return new WaitForSeconds(60 / shotsPerMinute);
-        autoFireReady = true;
-    }
-
-
-    /// <summary>
-    /// * Resets semi fire ready<br/>
-    /// ? This is based on the trigger being released<br/>
-    /// </summary>
-    private IEnumerator ResetSemiFireReady() {
-        yield return new WaitUntil(() => !triggerPressed);
-        semiFireReady = true;
-    }
-
-    /// <summary>
-    /// * Resets burst fire ready<br/><br/>
-    /// 
-    /// ! This one is a bit more complicated, and I'm not sure if it's optimized<br/>
-    /// ? When trigger is pressed during burst mode, the gun will fire [burstSize] times with the interval of [60 / burstRate].<br/>
-    /// ? After a shot is done, the gun will wait for [60 / burstRate] seconds, set burstFireReady to true, and then automatically<br/>
-    /// ? presses the trigger until [burstSize] shots are fired. When that is done, burstFireReady is reset to true when the<br/>
-    /// ? player releases the trigger. <br/>
-    /// ? Also, if the player reloads during the burst, the burst automatically reset to true <br/>
-    /// </summary>
-    private IEnumerator ResetBurstFireReady() {
-        burstShotsFired += 1;
-        if (burstShotsFired >= burstSize) {
-            yield break;
-        }
-        yield return new WaitForSeconds(60 / burstRate);
-        burstFireReady = true;
-        HandleTriggerPressed();
-        yield return new WaitUntil(() => (!triggerPressed && burstShotsFired >= burstSize) || reloading);
-        yield return new WaitForSeconds(60 / burstRate);
-        burstShotsFired = 0;
-        burstFireReady = true;
-    }
-
-    /// <summary>
-    /// * Handles when the trigger is pressed. This function is called every frame where [triggerPressed] is true<br/><br/>
-    /// 
-    /// ? Since this function calls every frame, it's important to set fireReady to false right after the shot is fired.<br/>
-    /// ? Otherwise, the gun will keep firing every single frame until the trigger is released.<br/>
-    /// </summary>
-    public void HandleTriggerPressed() {
-        if (currentAmmoInChamber <= 0) {
-            return;
-        }
-        if (currentFireMode == FireMode.Semi && semiFireReady) {
-            Fire();
-            semiFireReady = false;
-            StartCoroutine(ResetSemiFireReady());
-        }
-        if (currentFireMode == FireMode.Auto && autoFireReady) {
-            Fire();
-            autoFireReady = false;
-            StartCoroutine(ResetAutoFireReady());
-        }
-        if (currentFireMode == FireMode.Burst && burstFireReady) {
-            Fire();
-            burstFireReady = false;
-            StartCoroutine(ResetBurstFireReady());
+        IEnumerator ResetMelee() {
+            yield return new WaitForSeconds(switchTimeSeconds);
+            meleeReady = true;
         }
     }
+
 
     /// <summary>
     /// * Fires the gun.<br/><br/>
