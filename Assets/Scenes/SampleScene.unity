@@ -2996,8 +2996,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponSlots:
-  - {fileID: 2071962651439539118, guid: bea848e26853b4246890cef9817f782a, type: 3}
   - {fileID: 2071962651439539118, guid: a2be9728cf5a37d4283b2745059bfa53, type: 3}
+  - {fileID: 2071962651439539118, guid: d4ffa33606c32b143b01593af2995f5f, type: 3}
 --- !u!1 &1559270237
 GameObject:
   m_ObjectHideFlags: 0

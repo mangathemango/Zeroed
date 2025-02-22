@@ -1,6 +1,7 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using UnityEditor;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -34,11 +35,10 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {   
-        forwardDirection = Camera.main.transform.forward;
-        forwardDirection.y = 0;
         moveDirection = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized;
 
-        moveDirection = Quaternion.LookRotation(forwardDirection) * moveDirection;
+        moveDirection = CameraManager.Instance.RotateToCameraForwardDirection(moveDirection);
+        
         
 
         if (moveDirection.magnitude > 0)
