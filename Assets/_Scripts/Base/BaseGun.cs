@@ -284,9 +284,6 @@ public abstract class BaseGun : MonoBehaviour
 
         // This funtion is called every frame where the trigger is pressed
         void HandleTriggerPressed() {
-            if (currentAmmoInChamber <= 0) {
-                return;
-            }
             if (currentFireMode == FireMode.Semi && semiFireReady) {
                 Fire();
                 semiFireReady = false;
@@ -307,6 +304,9 @@ public abstract class BaseGun : MonoBehaviour
 
                 IEnumerator ResetAutoFireReady() {
                     yield return new WaitForSeconds(60 / shotsPerMinute);
+                    if (reloading) {
+                        yield return new WaitUntil(() => !triggerPressed);
+                    }
                     autoFireReady = true;
                 }
             }
@@ -424,7 +424,6 @@ public abstract class BaseGun : MonoBehaviour
     {   
         LookAtCursor();
         RotateAroundPlayer();
-        Debug.Log($"Semi fire ready: {semiFireReady}, trigger pressed: {triggerPressed}");
     }
 
     public void Disable() {
@@ -518,6 +517,9 @@ public abstract class BaseGun : MonoBehaviour
     /// TODO: Implement damage calculation based on range. <br/>
     /// </summary>
     protected virtual void Fire() {
+        if (currentAmmoInChamber <= 0) {
+            return;
+        }
         currentAmmoInChamber -= 1;
         if (!(currentFireMode == FireMode.Semi && requiresChargingBetweenShots)) {
             // Automatically charge the gun if gun doesn't require charging between shots
