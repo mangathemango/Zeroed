@@ -16,10 +16,12 @@ jobs:
       # Cache
       - uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          path: |
+            Library
+            Packages
+          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-${{ github.run_id }}
           restore-keys: |
-            Library-
+            Library-${{ runner.os }}-
 
       # Test
       - name: Run tests
@@ -44,10 +46,12 @@ jobs:
       # Cache
       - uses: actions/cache@v3
         with:
-          path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          path: |
+            Library
+            Packages
+          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-${{ github.run_id }}
           restore-keys: |
-            Library-
+            Library-${{ runner.os }}-
 
       # Build
       - name: Build project
