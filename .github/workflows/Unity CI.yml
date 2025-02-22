@@ -16,7 +16,9 @@ jobs:
       # Cache
       - uses: actions/cache@v3
         with:
-          path: Library
+          path: |
+            Library
+            Packages
           key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-${{ github.run_id }}
           restore-keys: |
             Library-${{ runner.os }}-
@@ -44,7 +46,9 @@ jobs:
       # Cache
       - uses: actions/cache@v3
         with:
-          path: Library
+          path: |
+            Library
+            Packages
           key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}-${{ github.run_id }}
           restore-keys: |
             Library-${{ runner.os }}-
