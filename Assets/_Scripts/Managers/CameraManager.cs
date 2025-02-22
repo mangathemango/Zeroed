@@ -52,7 +52,7 @@ public class CameraManager : Singleton<CameraManager> {
     /// </summary>
     void Update() {
         // Get target position for cameraFollow object
-        Vector3 targetPosition = playerTransform.position + playerMovement.ConvertToPlayerDirection(playerOffset + basePlayerOffset);
+        Vector3 targetPosition = playerTransform.position + RotateToCameraForwardDirection(playerOffset + basePlayerOffset);
 
         // Smoothly move the cameraFollow object to the target position
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref playerFollowVelocity, smoothTime);
