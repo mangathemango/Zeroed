@@ -119,7 +119,7 @@ MonoBehaviour:
   adsTimeSeconds: 0.3
   reloadTimeSeconds: 1
   chargingTime: 0.5
-  defaultFireMode: 1
+  defaultFireMode: 0
   maxDamage: 5
   minDamage: 1
   maxDamageRange: 2
@@ -163,10 +163,6 @@ MonoBehaviour:
   burstFireReady: 1
   currentAmmoInMag: 0
   currentAmmoInChamber: 0
-  triggerPressed: 0
-  charging: 0
-  reloading: 0
-  aiming: 0
 --- !u!82 &304901731273121659
 AudioSource:
   m_ObjectHideFlags: 0
