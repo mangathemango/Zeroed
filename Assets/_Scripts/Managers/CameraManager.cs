@@ -78,4 +78,16 @@ public class CameraManager : Singleton<CameraManager> {
     public void RotateClockwise(float degrees) {
         offset = Quaternion.Euler(0, degrees, 0) * offset;
     }
+
+    /// <summary>
+    /// * Rotates a vector to the camera's forward direction
+    /// TODO: This will need a better name
+    /// </summary>
+    /// <param name="vector">The input vector</param>
+    /// <returns>The rotated vector</returns>
+    public Vector3 RotateToCameraForwardDirection(Vector3 vector) {
+        Vector3 forwardDirection = Camera.main.transform.forward;
+        forwardDirection.y = 0;
+        return Quaternion.LookRotation(forwardDirection) * vector;
+    }
 }

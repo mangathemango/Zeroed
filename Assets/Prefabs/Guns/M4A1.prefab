@@ -85,6 +85,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6281924973566148575}
   m_SourcePrefab: {fileID: 100100000, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
+--- !u!4 &239233234423673064 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1392055971398381079, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
+  m_PrefabInstance: {fileID: 1153060988617170687}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2071962651439539118 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 42bdd0231e7fbfa498892da424cfa0b3, type: 3}
@@ -101,6 +106,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.103
   m_Pitch: 1
@@ -248,18 +254,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunName: M4A1
-  ammoType: {fileID: 0}
-  ammoCapacity: 10
-  mass: 0.1
-  recoil: 1
-  muzzleVelocity: 300
+  ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
+  magCapacity: 30
+  chamberCapacity: 1
+  mass: 2.9
+  muzzleVelocity: 860
   soundSignature: 1
   triggerPullTimeSeconds: 0.2
   switchTimeSeconds: 1
   adsTimeSeconds: 0.3
   reloadTimeSeconds: 1
   chargingTime: 0.5
-  defaultFireMode: 0
+  defaultFireMode: 1
   maxDamage: 10
   minDamage: 1
   maxDamageRange: 10
@@ -267,21 +273,24 @@ MonoBehaviour:
   armorPenetrationPercent: 0
   armorDamageMultiplier: 1
   headshotMultiplier: 2
-  hasSemiFire: 0
+  hasSemiFire: 1
   requiresChargingBetweenShots: 0
-  hasAutoFire: 0
-  shotsPerMinute: 600
+  hasAutoFire: 1
+  shotsPerMinute: 800
   hasBurstFire: 0
   burstSize: 0
-  burstRate: 600
-  pointFireSpreadMOA: 1
-  adsSpreadMOA: 0.1
-  pelletSpreadMOA: 2
+  burstRate: 100
+  pointFireSpreadMOA: 3.6
+  adsSpreadMOA: 1.8
+  pelletSpreadMOA: 0
+  recoilY: 1
+  recoilX: 1
+  Optics: 0
   meleeDamage: 10
   meleeRange: 2
   meleeKnockback: 1
   meleeStaggerTimeSeconds: 0.5
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 239233234423673064}
   deadTriggerSFX: {fileID: 0}
   disconnectorSFX: {fileID: 0}
   fireSFX: {fileID: 0}
@@ -289,3 +298,14 @@ MonoBehaviour:
   chargeSFX: {fileID: 0}
   meleeMissSFX: {fileID: 0}
   meleeHitSFX: {fileID: 0}
+  playerMovement: {fileID: 0}
+  environment: {fileID: 0}
+  playerTransform: {fileID: 0}
+  audioSource: {fileID: 0}
+  currentFireMode: 0
+  meleeReady: 1
+  autoFireReady: 1
+  semiFireReady: 1
+  burstFireReady: 1
+  currentAmmoInMag: 0
+  currentAmmoInChamber: 0

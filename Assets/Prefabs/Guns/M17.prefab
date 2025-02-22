@@ -109,8 +109,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: M17
   ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
-  ammoCapacity: 17
-  mass: 0.1
+  magCapacity: 17
+  chamberCapacity: 1
+  mass: 0.8
   muzzleVelocity: 375
   soundSignature: 1
   triggerPullTimeSeconds: 0
@@ -118,7 +119,7 @@ MonoBehaviour:
   adsTimeSeconds: 0.3
   reloadTimeSeconds: 1
   chargingTime: 0.5
-  defaultFireMode: 1
+  defaultFireMode: 0
   maxDamage: 5
   minDamage: 1
   maxDamageRange: 2
@@ -127,17 +128,18 @@ MonoBehaviour:
   armorDamageMultiplier: 1
   headshotMultiplier: 2
   hasSemiFire: 1
-  requiresChargingBetweenShots: 1
-  hasAutoFire: 1
-  shotsPerMinute: 600
-  hasBurstFire: 1
-  burstSize: 3
-  burstRate: 600
+  requiresChargingBetweenShots: 0
+  hasAutoFire: 0
+  shotsPerMinute: 100
+  hasBurstFire: 0
+  burstSize: 0
+  burstRate: 100
   pointFireSpreadMOA: 1
   adsSpreadMOA: 0.1
   pelletSpreadMOA: 2
   recoilY: 1
   recoilX: 0
+  Optics: 0
   meleeDamage: 3
   meleeRange: 2
   meleeKnockback: 200
@@ -150,9 +152,10 @@ MonoBehaviour:
   chargeSFX: {fileID: 8300000, guid: dea3910796337fb43af038b79056450f, type: 3}
   meleeMissSFX: {fileID: 8300000, guid: 30e47c7ac2501e24fa62adb27e95f093, type: 3}
   meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
-  player: {fileID: 0}
+  playerMovement: {fileID: 0}
+  environment: {fileID: 0}
+  playerTransform: {fileID: 0}
   audioSource: {fileID: 0}
-  rotateAround: {fileID: 0}
   currentFireMode: 0
   meleeReady: 1
   autoFireReady: 1
@@ -160,10 +163,6 @@ MonoBehaviour:
   burstFireReady: 1
   currentAmmoInMag: 0
   currentAmmoInChamber: 0
-  triggerPressed: 0
-  charging: 0
-  reloading: 0
-  aiming: 0
 --- !u!82 &304901731273121659
 AudioSource:
   m_ObjectHideFlags: 0
@@ -175,6 +174,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.103
   m_Pitch: 1

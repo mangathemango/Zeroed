@@ -42,7 +42,7 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
-        CurrentWeapon.SetActive(false);
+        CurrentWeapon.GetComponent<BaseGun>().Disable();
         currentWeaponIndex = weaponIndex;
     }
 
@@ -103,7 +103,7 @@ public class PlayerInventory : MonoBehaviour
             switchTimer += Time.deltaTime;
         } else {
             switchTimer = CurrentWeaponSwitchTime;
-            CurrentWeapon.SetActive(true);
+            CurrentWeapon.GetComponent<BaseGun>().Enable();
         }
     }
 
