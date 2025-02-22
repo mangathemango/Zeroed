@@ -73,9 +73,4 @@ public class PlayerMovement : MonoBehaviour
         rb.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
         yield break;
     }
-
-    public Vector3 ConvertToPlayerDirection(Vector3 direction)
-    {
-        return Quaternion.LookRotation(forwardDirection) * direction;
-    }
 }
