@@ -575,9 +575,9 @@ public abstract class BaseGun : MonoBehaviour
         // Convert MOA to radians
         float spreadRadians;
         if (aiming) {
-            spreadRadians = adsSpreadMOA * Mathf.Deg2Rad / 60f;
+            spreadRadians = adsSpreadMOA * Mathf.Deg2Rad;
         } else {
-            spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad / 60f;
+            spreadRadians = pointFireSpreadMOA * Mathf.Deg2Rad;
         }
         // Calculate the spread based on the distance to the target
         float spreadAtDistance = Mathf.Tan(spreadRadians) * targetDistance;
