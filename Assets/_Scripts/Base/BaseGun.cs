@@ -587,6 +587,8 @@ public abstract class BaseGun : MonoBehaviour
         // Apply random spread
         shootingDirection.x += Random.Range(-spreadAtDistance, spreadAtDistance);
         shootingDirection.y += Random.Range(-spreadAtDistance, spreadAtDistance);
+        shootingDirection.z += Random.Range(-spreadAtDistance, spreadAtDistance);
+
         return shootingDirection.normalized;
     }
 
