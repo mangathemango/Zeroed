@@ -101,6 +101,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.103
   m_Pitch: 1
@@ -249,9 +250,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: UMP45
   ammoType: {fileID: 0}
-  ammoCapacity: 10
+  ammoCapacity: 25
+  chamberCapacity: 1
   mass: 0.1
-  recoil: 1
   muzzleVelocity: 300
   soundSignature: 1
   triggerPullTimeSeconds: 0.2
@@ -267,16 +268,19 @@ MonoBehaviour:
   armorPenetrationPercent: 0
   armorDamageMultiplier: 1
   headshotMultiplier: 2
-  hasSemiFire: 0
+  hasSemiFire: 1
   requiresChargingBetweenShots: 0
-  hasAutoFire: 0
+  hasAutoFire: 1
   shotsPerMinute: 600
   hasBurstFire: 0
   burstSize: 0
-  burstRate: 600
+  burstRate: 100
   pointFireSpreadMOA: 1
-  adsSpreadMOA: 0.1
-  pelletSpreadMOA: 2
+  adsSpreadMOA: 5.5
+  pelletSpreadMOA: 0
+  recoilY: 1
+  recoilX: 1
+  Optics: 0
   meleeDamage: 10
   meleeRange: 2
   meleeKnockback: 1
@@ -289,3 +293,18 @@ MonoBehaviour:
   chargeSFX: {fileID: 0}
   meleeMissSFX: {fileID: 0}
   meleeHitSFX: {fileID: 0}
+  playerMovement: {fileID: 0}
+  environment: {fileID: 0}
+  playerTransform: {fileID: 0}
+  audioSource: {fileID: 0}
+  currentFireMode: 0
+  meleeReady: 1
+  autoFireReady: 1
+  semiFireReady: 1
+  burstFireReady: 1
+  currentAmmoInMag: 0
+  currentAmmoInChamber: 0
+  triggerPressed: 0
+  charging: 0
+  reloading: 0
+  aiming: 0
