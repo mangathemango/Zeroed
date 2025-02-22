@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: M4A1
   ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
-  ammoCapacity: 30
+  magCapacity: 30
   chamberCapacity: 1
   mass: 2.9
   muzzleVelocity: 860

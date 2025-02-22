@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: SCARH556
   ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
-  ammoCapacity: 30
+  magCapacity: 30
   chamberCapacity: 1
   mass: 3.3
   muzzleVelocity: 300

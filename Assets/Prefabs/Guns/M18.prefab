@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: M18
   ammoType: {fileID: 7218848645403415054, guid: 0177191dbab71c743828e77d21bf8516, type: 3}
-  ammoCapacity: 10
+  magCapacity: 10
   chamberCapacity: 1
   mass: 0.7
   muzzleVelocity: 300

@@ -44,7 +44,7 @@ public abstract class BaseGun : MonoBehaviour
     [Header("General")]
     public string gunName;
     public GameObject ammoType;
-    public int ammoCapacity = 10;
+    public int magCapacity = 10;
     public int chamberCapacity = 1;
     [Range (0.0f, 10.0f)]
     public float mass = 0.1f;
@@ -61,12 +61,13 @@ public abstract class BaseGun : MonoBehaviour
     [Range (0f, 4f)]
     public float reloadTimeSeconds = 1.0f;
     [Range (0f, 3f)]
-    public float chargingTime = 0.5f;
+    public float chargingTimeSeconds = 0.5f;
     public FireMode defaultFireMode = FireMode.Semi;
     
 
 
     [Header("Damage")]
+    //! These have not been implemented yet. Everything right now is just a placeholder. Damage is based on minDamage rn.
     [Range (0f, 100f)]
     public float maxDamage = 10.0f;
     [Range (0f, 100f)]
@@ -201,9 +202,9 @@ public abstract class BaseGun : MonoBehaviour
         reloadCoroutine ??= StartCoroutine(ReloadCoroutine());
 
         IEnumerator ReloadCoroutine() {
-            bool magazineIsFull = currentAmmoInMag >= ammoCapacity;
+            bool magazineIsFull = currentAmmoInMag >= magCapacity;
             bool chamberIsFull = currentAmmoInChamber >= chamberCapacity;
-            bool gunUsesMagazines = ammoCapacity > 0;
+            bool gunUsesMagazines = magCapacity > 0;
 
             if (gunUsesMagazines && magazineIsFull) {
                 reloadCoroutine = null;
@@ -219,7 +220,7 @@ public abstract class BaseGun : MonoBehaviour
             currentAmmoInMag = 0;
             yield return new WaitForSeconds(reloadTimeSeconds);
             if (gunUsesMagazines) {
-                currentAmmoInMag = ammoCapacity;
+                currentAmmoInMag = magCapacity;
             } else {
                 currentAmmoInChamber = chamberCapacity;
             }
@@ -241,7 +242,7 @@ public abstract class BaseGun : MonoBehaviour
 
             audioSource.PlayOneShot(chargeSFX, soundSignature / 2);
 
-            yield return new WaitForSeconds(chargingTime);
+            yield return new WaitForSeconds(chargingTimeSeconds);
             currentAmmoInMag -= 1;
             currentAmmoInChamber += 1;
             chargeCoroutine = null;
@@ -410,7 +411,7 @@ public abstract class BaseGun : MonoBehaviour
 
         // Setup gun stuff
         currentFireMode = defaultFireMode;
-        currentAmmoInMag = ammoCapacity - 1;
+        currentAmmoInMag = magCapacity - 1;
         currentAmmoInChamber = 1;
         SetupFireModes();
 
