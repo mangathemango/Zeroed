@@ -89,13 +89,14 @@ public abstract class BaseGun : MonoBehaviour
 
     [Header("Auto")]
     public bool hasAutoFire = false;
-    [Range (100.0f, 1000.0f)]
+    [Range (100.0f, 2000.0f)]
     public float shotsPerMinute = 600.0f;
 
     
     [Header("Burst")]
     public bool hasBurstFire = false;
     public int burstSize = 0;
+    [Range (100.0f, 2000.0f)]
     public float burstRate = 600.0f;
 
     [Header("Spread")]
