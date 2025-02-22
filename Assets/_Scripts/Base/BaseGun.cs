@@ -186,20 +186,19 @@ public abstract class BaseGun : MonoBehaviour
     }
 
 
+    
+    /// <summary>
+    ///* Reloads the gun <br/><br/>
+    /// 
+    ///? The reloading behavior is different depending on whether the gun uses magazines or not<br/>
+    ///? (if ammoCapacity == 0, the gun doesn't use magazines)<br/><br/>
+    ///
+    ///? - If the gun uses magazines, this function will fill up the magazine if it's not already full<br/>
+    ///? - If the gun doesn't use magazines, this function will fill up the chamber instead, if it's not already full<br/><br/>
+    /// </summary>
     public void Reload() {
-        if (reloadCoroutine == null) {
-            reloadCoroutine = StartCoroutine(ReloadCoroutine());
-        }
+        reloadCoroutine ??= StartCoroutine(ReloadCoroutine());
 
-        /// <summary>
-        ///* Reloads the gun <br/><br/>
-        /// 
-        ///? The reloading behavior is different depending on whether the gun uses magazines or not<br/>
-        ///? (if ammoCapacity == 0, the gun doesn't use magazines)<br/><br/>
-        ///
-        ///? - If the gun uses magazines, this function will fill up the magazine if it's not already full<br/>
-        ///? - If the gun doesn't use magazines, this function will fill up the chamber instead, if it's not already full<br/><br/>
-        /// </summary>
         IEnumerator ReloadCoroutine() {
             bool magazineIsFull = currentAmmoInMag >= ammoCapacity;
             bool chamberIsFull = currentAmmoInChamber >= chamberCapacity;
@@ -227,14 +226,12 @@ public abstract class BaseGun : MonoBehaviour
         }           
     }
 
+    /// <summary>
+    ///* Puts one bullet from mag into chamber, if the chamber is not full already<br/>
+    /// </summary>
     public void Charge() {
-        if (chargeCoroutine == null) {
-            chargeCoroutine = StartCoroutine(ChargeCoroutine());
-        }
+        chargeCoroutine ??= StartCoroutine(ChargeCoroutine());
 
-        /// <summary>
-        ///* Puts one bullet from mag into chamber, if the chamber is not full already<br/>
-        /// </summary>
         IEnumerator ChargeCoroutine() {
             if (currentAmmoInMag <= 0 || currentAmmoInChamber >= chamberCapacity) {
                 chargeCoroutine = null;
@@ -250,15 +247,19 @@ public abstract class BaseGun : MonoBehaviour
         }
     }
 
-    public void PressTrigger() {
-        if (triggerPressTransitioningCoroutine == null) {
-            triggerPressTransitioningCoroutine = StartCoroutine(TriggerPressTransitioning());
-        }
 
-        /// <summary>
-        /// * Presses the trigger of the gun<br/>
-        /// TODO: Generalize this function to work not only with left mouse button press<br/>
-        /// </summary>
+    /// <summary>
+    /// * Presses the trigger of the gun<br/>
+    /// ? This function has 2 coroutines: TriggerPressTransitioning() and TriggerPressCoroutine()<br/>
+    /// ? TriggerPressTransitioning() is used to delay the TriggerPressCoroutine() function by [triggerPullTimeSeconds]<br/>
+    /// ? TriggerPressCoroutine() is used to handle the trigger being pressed<br/>
+    /// ? TriggerPressCoroutine() procs HandleTriggerPressed() every frame while the mouse is pressed<br/>
+    /// 
+    /// TODO: Generalize this function to work not only with left mouse button press<br/>
+    /// </summary>
+    public void PressTrigger() {
+        triggerPressTransitioningCoroutine ??= StartCoroutine(TriggerPressTransitioning());
+
         IEnumerator TriggerPressTransitioning() {
             audioSource.PlayOneShot(disconnectorSFX, soundSignature);
             if (currentAmmoInChamber <= 0) {
@@ -272,7 +273,7 @@ public abstract class BaseGun : MonoBehaviour
             triggerPressTransitioningCoroutine = null;
         }
 
-        IEnumerator TriggerPressCoroutine() {
+        IEnumerator TriggerPressCoroutine() {   
             while (Input.GetMouseButton(0)) {
                 HandleTriggerPressed();
                 yield return null;
@@ -280,12 +281,8 @@ public abstract class BaseGun : MonoBehaviour
             triggerPressCoroutine = null;
         }
         
-        /// <summary>
-        /// * Handles when the trigger is pressed. This function is called every frame where [triggerPressed] is true<br/><br/>
-        /// 
-        /// ? Since this function calls every frame, it's important to set fireReady to false right after the shot is fired.<br/>
-        /// ? Otherwise, the gun will keep firing every single frame until the trigger is released.<br/>
-        /// </summary>
+
+        // This funtion is called every frame where the trigger is pressed
         void HandleTriggerPressed() {
             if (currentAmmoInChamber <= 0) {
                 return;
@@ -296,8 +293,11 @@ public abstract class BaseGun : MonoBehaviour
                 StartCoroutine(ResetSemiFireReady());
 
                 IEnumerator ResetSemiFireReady() {
-                    yield return new WaitUntil(() => !triggerPressed);
-                    semiFireReady = true;
+                    yield return null;
+                    while (triggerPressed) {
+                        yield return null;
+                    }
+                    semiFireReady = true;   
                 }
             }
             if (currentFireMode == FireMode.Auto && autoFireReady) {
@@ -319,66 +319,65 @@ public abstract class BaseGun : MonoBehaviour
                         Fire();
                         yield return new WaitForSeconds(60 / burstRate);
                     }
+                    StartCoroutine(ResetBurstFireReady());
+                }
+
+                IEnumerator ResetBurstFireReady() {
+                    yield return new WaitUntil(() => !triggerPressed);
                     burstFireReady = true;
                 }
             }
         }
     }
 
+    /// <summary>
+    /// * Aims down the sight<br/>
+    /// 
+    /// ? Note: This function has 2 coroutines: AimDownSightTransitioning() and AimDownSightCoroutine()<br/>
+    /// ? AimDownSightTransitioning() is used to delay the AimDownSightCoroutine() function by [adsTimeSeconds]<br/>
+    /// ? AimDownSightCoroutine() is used to move the camera away from the player to simulate aiming down the sight<br/>
+    /// TODO: Generalize this function to work not only with right mouse button press<br/>
+    /// </summary>
     public void AimDownSight() {
-        if (aimDownSightTransitioningCoroutine == null) {
-            aimDownSightTransitioningCoroutine = StartCoroutine(AimDownSightTransitioning());
-        }
+        aimDownSightTransitioningCoroutine ??= StartCoroutine(AimDownSightTransitioning());
         
-        /// <summary>
-        /// * Aims down the sight<br/>
-        /// TODO: Generalize this function to work not only with right mouse button press<br/>
-        /// </summary>
         IEnumerator AimDownSightTransitioning() {
             yield return new WaitForSeconds(adsTimeSeconds);
 
-            aimDownSightCoroutine = StartCoroutine(AimDownSightCoroutine());
+            aimDownSightCoroutine ??= StartCoroutine(AimDownSightCoroutine());
             
             yield return new WaitUntil(() => !Input.GetMouseButton(1));
+
+            StopCoroutine(aimDownSightCoroutine);
+            aimDownSightCoroutine = null;
+            CameraManager.Instance.playerOffset = Vector3.zero;
             aimDownSightTransitioningCoroutine = null;
         }
 
-        /// <summary>
-        ///* Handles when the player aims down the sight<br/><br/>
-        ///
-        ///? This function basically moves the camera further away from the player in order to inspect the environment.<br/>
-        ///? How much the camera is moved away from the player is calculated by: <br/>
-        ///? The cursor's distance from the center of the screen * the scope multiplier<br/>
-        ///? Details on how exactly the camera shifts from the player is in the CameraManager script<br/>
-        ///
-        /// TODO: The switch case for scopeMultiplier will be omitted after the Optics are replaced with ScriptableObjects
-        /// </summary>
         IEnumerator AimDownSightCoroutine() {
-            float scopeMultiplier;
-            switch (Optics) {
-                case OpticType.x1:
-                    scopeMultiplier = 1.0f;
-                    break;
-                case OpticType.x2:
-                    scopeMultiplier = 2.0f;
-                    break;
-                case OpticType.x3:
-                    scopeMultiplier = 3.0f;
-                    break;
-                case OpticType.x4:
-                    scopeMultiplier = 4.0f;
-                    break;
-                default:
-                    scopeMultiplier = 1.0f;
-                    break;
-            }
-            while (aiming) {
+            float scopeMultiplier = GetScopeMultiplier();
+            while (true) {
                 Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
+                // Shifts the camera away from the player
                 CameraManager.Instance.playerOffset = aimOffset * 10;
                 yield return null;
             }
-            CameraManager.Instance.playerOffset = Vector3.zero;
-            aimDownSightCoroutine = null;
+        }
+
+        // TODO: The switch case for scopeMultiplier will be omitted after the Optics are replaced with ScriptableObjects
+        float GetScopeMultiplier() {
+            switch (Optics) {
+                case OpticType.x1:
+                    return 1.0f;
+                case OpticType.x2:
+                    return 2.0f;
+                case OpticType.x3:
+                    return 3.0f;
+                case OpticType.x4:
+                    return 4.0f;
+                default:
+                    return 1.0f;
+            }
         }
     }
 
@@ -425,6 +424,7 @@ public abstract class BaseGun : MonoBehaviour
     {   
         LookAtCursor();
         RotateAroundPlayer();
+        Debug.Log($"Semi fire ready: {semiFireReady}, trigger pressed: {triggerPressed}");
     }
 
     public void Disable() {
