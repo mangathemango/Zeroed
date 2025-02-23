@@ -70,7 +70,8 @@ public class BaseBullet: MonoBehaviour {
     /// <param name="explosionForce">How much the enemy is knocked back away from the bullet</param>
     /// <param name="explosionRadius">The AOE radius of the explosion</param>
     protected void DealExplosionDamage(float explosionForce, float explosionRadius) {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
+        Collider[] hitColliders = new Collider[100];
+        Physics.OverlapSphereNonAlloc(transform.position, explosionRadius, hitColliders);
         foreach (var hitCollider in hitColliders) {
             if (IsGameObjectAnEnemy(hitCollider.gameObject, out BaseEnemy enemy)) {
                 Vector3 explosionDirection = (transform.position - hitCollider.transform.position).normalized;
