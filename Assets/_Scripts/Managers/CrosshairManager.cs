@@ -162,8 +162,7 @@ public class Crosshair : Singleton<Crosshair>
 
     public RaycastHit CrosshairToRaycastHit()
     {
-        RaycastHit hit;
-        Physics.Raycast(CrosshairToRay(), out hit);
+        Physics.Raycast(CrosshairToRay(), out RaycastHit hit);
         return hit;
     }
 
