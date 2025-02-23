@@ -81,8 +81,7 @@ public class UiUpdater: Singleton<UiUpdater> {
         UpdateGunName();
     }
     private void UpdateAmmoText() {
-        int currentAmmo = currentGun.currentAmmoInMag + currentGun.currentAmmoInChamber;
-        ammoCountUI.text = currentAmmo.ToString();
+        ammoCountUI.text = currentGun.getTotalAmmo.ToString();
         while (ammoCountUI.text.Length < 2) {
             ammoCountUI.text = "0" + ammoCountUI.text;
         }
@@ -90,7 +89,7 @@ public class UiUpdater: Singleton<UiUpdater> {
 
     private float currentReloadRotation = 0;
     private void UpdateChamberUI() {
-        if (currentGun.currentAmmoInChamber <= 0) {
+        if (currentGun.hasBulletInChamber) {
             chamberUI.color = new Color(1f, 1f, 1f, 0.5f);
             chargeUI.color = new Color(1f, 1f, 1f, 0.5f);
         }
