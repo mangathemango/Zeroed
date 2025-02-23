@@ -368,7 +368,7 @@ public abstract class BaseGun : MonoBehaviour
 
             StopCoroutine(aimDownSightCoroutine);
             aimDownSightCoroutine = null;
-            CameraManager.Instance.playerOffset = Vector3.zero;
+            CameraManager.Instance.aimOffset = Vector3.zero;
             aimDownSightTransitioningCoroutine = null;
         }
 
@@ -377,7 +377,7 @@ public abstract class BaseGun : MonoBehaviour
             while (true) {
                 Vector3 aimOffset = Crosshair.Instance.GetCrosshairDistanceFromCenter() * scopeMultiplier;
                 // Shifts the camera away from the player
-                CameraManager.Instance.playerOffset = aimOffset * 10;
+                CameraManager.Instance.aimOffset = aimOffset * 10;
                 yield return null;
             }
         }
