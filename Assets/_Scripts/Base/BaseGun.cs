@@ -47,7 +47,7 @@ public abstract class BaseGun : MonoBehaviour
     [SerializeField] private int magCapacity = 10;
     [SerializeField] private int chamberCapacity = 1;
     [Range (0.0f, 10.0f)]
-    [SerializeField] private float mass = 0.1f;
+    [SerializeField] public float mass = 0.1f;
     [Range (10.0f, 1000.0f)]
     [SerializeField] private float muzzleVelocity = 300.0f;
     [Range (1.0f, 10.0f)]
@@ -55,7 +55,7 @@ public abstract class BaseGun : MonoBehaviour
     [Range (0f, 1f)]
     [SerializeField] private float triggerPullTimeSeconds = 0.2f;
     [Range (0f, 3f)]
-    [SerializeField] private float switchTimeSeconds = 1.0f;
+    [SerializeField] public float switchTimeSeconds = 1.0f;
     [Range (0f, 2f)]
     [SerializeField] private float adsTimeSeconds = 0.3f;
     [Range (0f, 4f)]
