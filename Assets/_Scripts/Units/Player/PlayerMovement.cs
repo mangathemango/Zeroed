@@ -20,11 +20,10 @@ public class PlayerMovement : MonoBehaviour
     public float moveHorizontal {get; set;}
     public float moveVertical {get; set;}
 
-    [NonSerialized] private float currentSpeed;
-    [NonSerialized] private Vector3 moveDirection;
-    [NonSerialized] private Vector3 dashDirection;
-    [NonSerialized] private GameObject currentWeapon;
-    [NonSerialized] private Rigidbody rb;
+    private float currentSpeed;
+    private Vector3 moveDirection;
+    private Vector3 dashDirection;
+    private Rigidbody rb;
 
     void Start()
     {
