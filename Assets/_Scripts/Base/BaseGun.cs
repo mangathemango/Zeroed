@@ -585,7 +585,7 @@ public abstract class BaseGun : MonoBehaviour
         GameObject InstantiateBullet(Vector3 direction, float velocity, float damage) {
             GameObject bullet = Instantiate(ammoType, firePoint.transform.position, transform.rotation, environment);
             bullet.GetComponent<Rigidbody>().linearVelocity = direction * velocity;
-            bullet.GetComponent<BaseBullet>().damage = damage;
+            bullet.GetComponent<BaseBullet>().SetDamage(damage);
             return bullet;
         }
 

@@ -10,7 +10,7 @@ public class SingleBullet : BaseBullet
         base.OnCollisionEnter(collision);
         if (IsGameObjectAnEnemy(collision.gameObject, out BaseEnemy enemy))
         {
-            DealSingleDamage(enemy, damage);
+            DealSingleDamage(enemy);
         }
     }
 }
