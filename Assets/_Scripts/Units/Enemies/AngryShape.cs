@@ -2,28 +2,15 @@ using UnityEngine;
 
 public class AngryShape : BaseEnemy
 {
-    public Transform player;
-    private Rigidbody rb;
-    // Update is called once per frame
-    void Start() {
-        if (player == null)
-        {
-            GameObject playerGameObject = GameObject.Find("Player");
-            if (playerGameObject != null)
-            {
-                player = playerGameObject.transform;
-            }
-        }
-        rb = GetComponent<Rigidbody>();
-    }
     void Update()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3 direction = (playerTransform.position - transform.position).normalized;
         rb.AddForce(direction * speed);
-        if (health <= 0)
-        {
-            rb.constraints = RigidbodyConstraints.None;
-            speed = 0;
-        }
+    }
+
+    public override void OnDeath() {
+        base.OnDeath();
+        rb.constraints = RigidbodyConstraints.None;
+        speed = 0;
     }
 }

@@ -8,14 +8,22 @@ using UnityEngine;
 ///? Damage dealing is done by the child classes of BaseBullet, such as SingleBullet and ExplosionBullet.<br/>
 /// </summary>
 public class BaseBullet: MonoBehaviour {
-    public float damage = 0f;
-    public float despawnTime = 5;
-    public float despawnOnCollisionTime = 0.1f;
-    public bool stopAfterCollision = true;
+    [SerializeField] private float _damage = 0f;
+    [SerializeField] private float despawnTime = 5;
+    [SerializeField] private float despawnOnCollisionTime = 0.1f;
+    [SerializeField] private bool stopAfterCollision = true;
     protected Rigidbody rb;
     protected SphereCollider sc;
 
-
+    /// <summary>
+    /// * Set the damage of the bullet. <br/><br/>
+    /// 
+    /// ? This function is currently used by BaseGun to set the damage based on the gun's damage stats <br/>
+    /// </summary>
+    /// <param name="damage">The amount of damage to deal</param>
+    public void SetDamage(float damage) {
+        _damage = damage;
+    }
 
     /// <summary>
     ///* Setup the bullet with a rigidbody if it doesn't have one <br/><br/>
@@ -59,8 +67,8 @@ public class BaseBullet: MonoBehaviour {
     /// </summary>
     /// <param name="enemy">The BaseEnemy component of a game object</param>
     /// <param name="damage">The amount of damage to deal</param>
-    protected void DealSingleDamage(BaseEnemy enemy, float damage) {
-        enemy.TakeDamage(damage);
+    protected void DealSingleDamage(BaseEnemy enemy) {
+        enemy.TakeDamage(_damage);
     }
 
     /// <summary>
@@ -75,7 +83,7 @@ public class BaseBullet: MonoBehaviour {
         foreach (var hitCollider in hitColliders) {
             if (IsGameObjectAnEnemy(hitCollider.gameObject, out BaseEnemy enemy)) {
                 Vector3 explosionDirection = (transform.position - hitCollider.transform.position).normalized;
-                enemy.TakeDamage(damage , -explosionForce * explosionDirection);
+                enemy.TakeDamage(_damage , -explosionForce * explosionDirection);
             }
         }
     }

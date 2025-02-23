@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerInputHandler: Singleton<PlayerInputHandler>
 {
-    PlayerInventory playerInventory;
-    PlayerMovement movement;
-    BaseGun currentGun;
+    private PlayerInventory playerInventory;
+    private PlayerMovement movement;
+    private BaseGun currentGun;
     private void Start()
     {
         playerInventory = GetComponent<PlayerInventory>();
@@ -47,7 +47,7 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
         movement.moveVertical = Input.GetAxisRaw("Vertical");
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            StartCoroutine(movement.Dash());
+            movement.Dash();
         }
     }
 }

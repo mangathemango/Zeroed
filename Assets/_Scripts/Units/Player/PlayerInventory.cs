@@ -8,17 +8,19 @@ using UnityEngine;
 /// </summary>
 public class PlayerInventory : MonoBehaviour
 {
-    public GameObject[] weaponSlots = new GameObject[3];
+    [SerializeField] private GameObject[] weaponSlots = new GameObject[3];
     private int currentWeaponIndex = 0;
     private int currentWeaponHeldIndex = 0;
     private float switchTimer = 0;
+    private Rigidbody rb;
     public GameObject CurrentWeapon {
         get {return weaponSlots[currentWeaponIndex];}
     }
+
+    // TODO: This will need better caching to avoid calling GetComponent() every frame
     private float CurrentWeaponSwitchTime {
         get {return CurrentWeapon.GetComponent<BaseGun>().switchTimeSeconds;}
     }
-    private Rigidbody rb;
 
     // Start is called before the first frame update
     private void Start()

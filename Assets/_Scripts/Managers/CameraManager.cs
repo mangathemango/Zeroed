@@ -11,11 +11,16 @@ using UnityEngine;
 /// ? This way, the camera's movement is smooth, and the player's movement doesn't affect the camera's angle as much.<br/>
 /// </summary>
 public class CameraManager : Singleton<CameraManager> {
-    public Transform cameraFollow;
-    public Vector3 offset;
-    public float smoothTime = 0.3f;
-    public Vector3 basePlayerOffset;
+    [SerializeField] private Transform cameraFollow;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Vector3 offset;
+    [SerializeField] private float smoothTime = 0.3f;
+    [SerializeField] private Vector3 basePlayerOffset;
+    private Vector3 playerFollowVelocity = Vector3.zero;
+    private Vector3 cameraVelocity = Vector3.zero;
 
+    //* This aimOffset variable is used solely by the aiming system. By default, this value is always Vector3.zero.
+    [NonSerialized] public Vector3 aimOffset = Vector3.zero;
     public Vector3 playerPositionOnScreen {get {
         return Camera.main.WorldToScreenPoint(playerTransform.position);
     }}
@@ -26,33 +31,24 @@ public class CameraManager : Singleton<CameraManager> {
             0
         );
     }}
-    //* This variable is used solely by the aiming system. By default, this value is always Vector3.zero.
-    // TODO: This probably needs a better name
-    [NonSerialized] public Vector3 playerOffset = Vector3.zero;
-    [NonSerialized] private PlayerMovement playerMovement;
-    [NonSerialized] private Transform playerTransform;
-    [NonSerialized] private Vector3 playerFollowVelocity = Vector3.zero;
-    [NonSerialized] private Vector3 cameraVelocity = Vector3.zero;
 
 
     /// <summary>
     /// * Sets up the references to the player and the camera follow object
     /// </summary>
-    void Start () {
+    private void Start () {
         GameObject player = GameObject.Find("Player");
         playerTransform = player.transform;
-        playerMovement = player.GetComponent<PlayerMovement>();
         cameraFollow.position = playerTransform.position;
     }
 
     /// <summary>
     /// * Updates the the position and rotation of the camera <br/><br/>
     /// ? Note: playerOffset by default has a value of 0, and will only change while the gun is aiming.<br/>
-    /// ! playerMovement.ConvertToPlayerDirection() will be optimized in the future.
     /// </summary>
-    void Update() {
+    private void Update() {
         // Get target position for cameraFollow object
-        Vector3 targetPosition = playerTransform.position + RotateToCameraForwardDirection(playerOffset + basePlayerOffset);
+        Vector3 targetPosition = playerTransform.position + RotateToCameraForwardDirection(aimOffset + basePlayerOffset);
 
         // Smoothly move the cameraFollow object to the target position
         cameraFollow.position = Vector3.SmoothDamp(cameraFollow.position, targetPosition, ref playerFollowVelocity, smoothTime);
