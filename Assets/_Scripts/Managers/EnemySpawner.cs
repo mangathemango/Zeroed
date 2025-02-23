@@ -7,13 +7,12 @@ using UnityEngine;
 /// </summary>
 public class EnemySpawner : Singleton<EnemySpawner>
 {
-    public Transform corner1;
-    public Transform corner2;
-    public GameObject enemyPrefab;
-    private GameObject enemyContainer;
-    public float spawnRate = 1;
+    [SerializeField] private Transform corner1;
+    [SerializeField] private Transform corner2;
+    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private float spawnRate = 1;
+    [SerializeField] private GameObject enemyContainer;
 
-    private bool readyToSpawn = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,20 +22,15 @@ public class EnemySpawner : Singleton<EnemySpawner>
     // Update is called once per frame
     void Update()
     {
-        if (readyToSpawn)
-        {
-            SpawnEnemy();
-            readyToSpawn = false;
-            Invoke("ResetReadyToSpawn", spawnRate);
-        }
-    }
-
-    void ResetReadyToSpawn() {
-        readyToSpawn = true;
+        InvokeRepeating(nameof(SpawnEnemy), 0, spawnRate);
     }
 
     void SpawnEnemy() {
-        Vector3 spawnPosition = new Vector3(Random.Range(corner1.position.x, corner2.position.x), 2, Random.Range(corner1.position.z, corner2.position.z));
+        Vector3 spawnPosition = new Vector3(
+            Random.Range(corner1.position.x, corner2.position.x), 
+            2, 
+            Random.Range(corner1.position.z, corner2.position.z)
+        );
         Instantiate(enemyPrefab, spawnPosition, Quaternion.identity, enemyContainer.transform);
     }
 }
