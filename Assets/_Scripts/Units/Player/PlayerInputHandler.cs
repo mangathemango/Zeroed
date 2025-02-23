@@ -47,7 +47,7 @@ public class PlayerInputHandler: Singleton<PlayerInputHandler>
         movement.moveVertical = Input.GetAxisRaw("Vertical");
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            StartCoroutine(movement.Dash());
+            movement.Dash();
         }
     }
 }

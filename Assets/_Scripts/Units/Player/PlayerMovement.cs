@@ -8,10 +8,10 @@ using UnityEditor.Callbacks;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
-    public float dashSpeed = 20.0f;
-    public float dashCooldownSeconds = 1f;
-    public float maxSpeed = 10.0f;
-    public int maxDashNum = 2;
+    [SerializeField] private float dashSpeed = 20.0f;
+    [SerializeField] private float dashCooldownSeconds = 1f;
+    [SerializeField] private float maxSpeed = 10.0f;
+    [SerializeField] private int maxDashNum = 2;
 
     private float currentDashCount = 0;
     public float getCurrentDashCount {
@@ -23,10 +23,7 @@ public class PlayerMovement : MonoBehaviour
     [NonSerialized] private float currentSpeed;
     [NonSerialized] private Vector3 moveDirection;
     [NonSerialized] private Vector3 dashDirection;
-    [NonSerialized] private Vector3 forwardDirection;
-
-    [Header("References")]
-    [NonSerialized] public GameObject currentWeapon;
+    [NonSerialized] private GameObject currentWeapon;
     [NonSerialized] private Rigidbody rb;
 
     void Start()
@@ -37,12 +34,23 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {   
-        moveDirection = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized;
+        UpdateDashCount();
+        UpdateSpeed();
+        Move();
+    }
 
-        moveDirection = CameraManager.Instance.RotateToCameraForwardDirection(moveDirection);
-        
-        
-
+    void UpdateDashCount() {
+        if (currentDashCount < maxDashNum)
+        {
+            currentDashCount += Time.deltaTime / dashCooldownSeconds;
+        }
+        else
+        {
+            currentDashCount = maxDashNum;
+        }
+    }
+    
+    void UpdateSpeed() {
         if (moveDirection.magnitude > 0)
         {
             currentSpeed = maxSpeed;
@@ -52,25 +60,21 @@ public class PlayerMovement : MonoBehaviour
         {
             currentSpeed = 0;
         }
-        if (currentDashCount < maxDashNum)
-        {
-            currentDashCount += Time.deltaTime / dashCooldownSeconds;
-        }
-        else
-        {
-            currentDashCount = maxDashNum;
-        }
+    }
+
+    void Move() {
+        moveDirection = new Vector3(moveHorizontal, 0.0f, moveVertical).normalized;
+        moveDirection = CameraManager.Instance.RotateToCameraForwardDirection(moveDirection);
         rb.AddForce(moveDirection * currentSpeed);
     }
 
-    public IEnumerator Dash()
+    public void Dash()
     {
         if (currentDashCount <= 0)
         {
-            yield break;
+            return;
         }
         currentDashCount--;
         rb.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
-        yield break;
     }
 }
