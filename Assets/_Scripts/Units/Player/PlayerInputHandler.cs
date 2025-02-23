@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerInputHandler: Singleton<PlayerInputHandler>
 {
-    PlayerInventory playerInventory;
-    PlayerMovement movement;
-    BaseGun currentGun;
+    private PlayerInventory playerInventory;
+    private PlayerMovement movement;
+    private BaseGun currentGun;
     private void Start()
     {
         playerInventory = GetComponent<PlayerInventory>();
