@@ -6,21 +6,22 @@ using UnityEngine;
 /// </summary>
 public class BaseEnemy : MonoBehaviour
 {
-    public float health = 100;
-    public float deathTime = 1f;
-    public float speed = 5;
-    private float tempSpeed;
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private float maxHealth = 100;
+    [SerializeField] private float maxSpeed = 5;
+    [SerializeField] private float deathTime = 1f;
+    protected float currentHealth = 100;
+    protected float speed;
+    protected Rigidbody rb;
+    protected Transform playerTransform;
+
+    protected virtual void Start()
     {
-        
+        currentHealth = maxHealth;
+        speed = maxSpeed;
+        rb = GetComponent<Rigidbody>();
+        playerTransform = GameObject.Find("Player").transform;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     /// <summary>
     ///* Take damage from a bullet <br/>
     ///! This is just a temporary implementation, and will be replaced with a more general damage dealing system
@@ -31,39 +32,38 @@ public class BaseEnemy : MonoBehaviour
     public void TakeDamage(float damage, Vector3 knockback = new Vector3(), float meleeStaggerTime = 0f)
     {   
         
-        health -= damage;
-        if (health <= 0)
+        currentHealth -= damage;
+        if (currentHealth <= 0)
         {   
-            Invoke("Die", deathTime);
+            OnDeath();
         }
         GetComponent<Rigidbody>().AddForce(knockback, ForceMode.Impulse);
-        if (meleeStaggerTime > 0)
-        {
-            Stagger(meleeStaggerTime);
-        }
+        Stagger(meleeStaggerTime);
     }
+
     /// <summary>
     ///* Stagger the enemy, which basically means they can't move for a certain amount of time <br/>
     ///! The temp speed is mad sus, and may cause issues in the future <br/>
-    ///TODO: Probably separate baseSpeed and currentSpeed apart from each other
     /// </summary>
     /// <param name="staggerTime">Stagger time in seconds</param>
-    public void Stagger(float staggerTime)
+    private void Stagger(float staggerTime)
     {
-        tempSpeed = speed;
         speed = 0;
-        Invoke("Unstagger", staggerTime);
+        Invoke(nameof(Unstagger), staggerTime);
     }
 
     /// <summary>
     ///* Unstagger the enemy, which basically means they can move again
     /// </summary>
-    public void Unstagger()
+    private void Unstagger()
     {
-        speed = tempSpeed;
+        speed = maxSpeed;
     }
 
-    public void Die() {
-        Destroy(gameObject);
+    /// <summary>
+    /// * What happens when the enemy dies
+    /// </summary>
+    public virtual void OnDeath() {
+        Destroy(gameObject, deathTime);
     }
 }
