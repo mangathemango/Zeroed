@@ -8,7 +8,7 @@ public class SingleBullet : BaseBullet
     protected override void OnCollisionEnter(Collision collision)
     {
         base.OnCollisionEnter(collision);
-        if (IsGameObjectAnEnemy(collision.gameObject, out BaseEnemy enemy))
+        if (collision.gameObject.TryGetComponent(out BaseEnemy enemy))
         {
             DealSingleDamage(enemy);
         }

@@ -517,9 +517,8 @@ public abstract class BaseGun : MonoBehaviour
 
         /// ? This is a child function of Melee()<br/>
         void HandleMeleeHit() {
-            GameObject hitObject = hit.collider.gameObject;
-            if (hitObject.GetComponent<BaseEnemy>() != null) {
-                hitObject.GetComponent<BaseEnemy>().TakeDamage(meleeDamage, firePoint.forward * meleeKnockback, meleeStaggerTimeSeconds);
+            if (hit.collider.gameObject.TryGetComponent(out BaseEnemy enemy)) {
+                enemy.TakeDamage(meleeDamage, firePoint.forward * meleeKnockback, meleeStaggerTimeSeconds);
             }
             audioSource.PlayOneShot(meleeHitSFX, soundSignature / 2);  
         }

@@ -49,17 +49,6 @@ public class BaseBullet: MonoBehaviour {
         }
         Destroy(gameObject, despawnOnCollisionTime);
     }
-    
-    /// <summary>
-    /// * Check if a game object is an enemy, and return the enemy if it is
-    /// </summary>
-    /// <param name="go">The input game object</param>
-    /// <param name="enemy">The BaseEnemy component of the game object</param>
-    /// <returns>Whether the game object is an enemy</returns>
-    protected bool IsGameObjectAnEnemy(GameObject go, out BaseEnemy enemy) {
-        enemy = go.GetComponent<BaseEnemy>();
-        return enemy != null;
-    }
 
     /// <summary>
     /// * Deal damage to a single enemy <br/><br/>
@@ -81,7 +70,7 @@ public class BaseBullet: MonoBehaviour {
         Collider[] hitColliders = new Collider[100];
         Physics.OverlapSphereNonAlloc(transform.position, explosionRadius, hitColliders);
         foreach (var hitCollider in hitColliders) {
-            if (IsGameObjectAnEnemy(hitCollider.gameObject, out BaseEnemy enemy)) {
+            if (hitCollider.gameObject.TryGetComponent(out BaseEnemy enemy)) {
                 Vector3 explosionDirection = (transform.position - hitCollider.transform.position).normalized;
                 enemy.TakeDamage(_damage , -explosionForce * explosionDirection);
             }
