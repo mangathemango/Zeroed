@@ -37,7 +37,7 @@ public class BaseEnemy : MonoBehaviour
         {   
             OnDeath();
         }
-        GetComponent<Rigidbody>().AddForce(knockback, ForceMode.Impulse);
+        rb.AddForce(knockback, ForceMode.Impulse);
         Stagger(meleeStaggerTime);
     }
 
