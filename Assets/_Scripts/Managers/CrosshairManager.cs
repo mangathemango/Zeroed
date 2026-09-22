@@ -39,15 +39,7 @@ public class Crosshair : Singleton<Crosshair>
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
         crosshair.position += new Vector3(mouseX, mouseY, 0);
-        ClampCrosshairOnViewDiagonals(out bool cursorIsOnViewDiagonals);
         
-        if (cursorIsOnViewDiagonals && rotateCameraReady) {
-            RotateCamera();
-            rotateCameraReady = false;
-            float followDuration = 0.5f;
-            StartCoroutine(FollowCrosshairWorldPoint(followDuration));
-            StartCoroutine(ResetCameraReady(followDuration));
-        }
 
     }
 

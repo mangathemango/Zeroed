@@ -10,19 +10,20 @@ public class EnemySpawner : Singleton<EnemySpawner>
     [SerializeField] private Transform corner1;
     [SerializeField] private Transform corner2;
     [SerializeField] private GameObject enemyPrefab;
-    [SerializeField] private float spawnRate = 1;
+    [SerializeField] private float spawnRate = 2.0f;
     [SerializeField] private GameObject enemyContainer;
 
     // Start is called before the first frame update
     void Start()
     {
         enemyContainer = GameObject.Find("Enemies");
+        InvokeRepeating(nameof(SpawnEnemy), 0, spawnRate);
     }
 
     // Update is called once per frame
     void Update()
     {
-        InvokeRepeating(nameof(SpawnEnemy), 0, spawnRate);
+        
     }
 
     void SpawnEnemy() {

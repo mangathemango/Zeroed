@@ -118,12 +118,12 @@ MonoBehaviour:
   switchTimeSeconds: 1
   adsTimeSeconds: 0.3
   reloadTimeSeconds: 1
-  chargingTime: 0.5
+  chargingTimeSeconds: 0.5
   defaultFireMode: 0
-  maxDamage: 5
-  minDamage: 1
-  maxDamageRange: 2
-  minDamageRange: 100
+  maxDamage: 40
+  minDamage: 30
+  maxDamageRange: 15
+  minDamageRange: 60
   armorPenetrationPercent: 0
   armorDamageMultiplier: 1
   headshotMultiplier: 2
@@ -152,17 +152,7 @@ MonoBehaviour:
   chargeSFX: {fileID: 8300000, guid: dea3910796337fb43af038b79056450f, type: 3}
   meleeMissSFX: {fileID: 8300000, guid: 30e47c7ac2501e24fa62adb27e95f093, type: 3}
   meleeHitSFX: {fileID: 8300000, guid: 907529d8dfc344a438b7e77ca2300f1b, type: 3}
-  playerMovement: {fileID: 0}
-  environment: {fileID: 0}
-  playerTransform: {fileID: 0}
-  audioSource: {fileID: 0}
   currentFireMode: 0
-  meleeReady: 1
-  autoFireReady: 1
-  semiFireReady: 1
-  burstFireReady: 1
-  currentAmmoInMag: 0
-  currentAmmoInChamber: 0
 --- !u!82 &304901731273121659
 AudioSource:
   m_ObjectHideFlags: 0

@@ -563,7 +563,7 @@ public abstract class BaseGun : MonoBehaviour
             audioSource.PlayOneShot(fireSFX, soundSignature);
         }
         // Move the crosshair to random direction
-        Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
+        // Crosshair.Instance.Recoil(Random.Range(-recoilX, recoilX) * 10, recoilY * 10);
 
         
         /// * Automatically charges the gun<br/><br/>
@@ -592,6 +592,7 @@ public abstract class BaseGun : MonoBehaviour
         Vector3 GetShootingDirection() {
             // Cast the first ray from shot placement to get target point
             Vector3 targetPoint = Crosshair.Instance.CrosshairToRaycastHit().point;
+            targetPoint.y = playerTransform.position.y;
             float targetDistance = 100f;
 
             // Cast the second ray from the firepoint to the target point to get the expected hit point
